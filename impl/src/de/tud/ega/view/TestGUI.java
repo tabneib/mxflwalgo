@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import de.tud.ega.model.Vertex;
+import de.tud.ega.model.Graph;
 import de.tud.ega.model.Point;
 
 
@@ -19,23 +20,23 @@ import de.tud.ega.model.Point;
  * Class controls the Window for visualization of a list of edges.
  * 
  */
-public class TestGUI implements ActionListener {
+public class TestGUI{
 
 	
 	private JFrame frame = new JFrame("Test GUI");
-	private GraphPanel pnlEdges = new GraphPanel();
+	private GraphPanel graphPanel = new GraphPanel();
 	
 	/**
 	 * Creates a new EdgeDrawer.
 	 */
-	public TestGUI() {
+	public TestGUI(Graph graph) {
 		this.init();
 	}
 	
 	
 	private void init() {
 		
-		this.frame.getContentPane().add(this.pnlEdges, BorderLayout.CENTER);
+		this.frame.getContentPane().add(this.graphPanel, BorderLayout.CENTER);
 		
 		this.frame.setBounds(50, 50, 750, 500);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +48,7 @@ public class TestGUI implements ActionListener {
 	 * 			added edge
 	 */
 	public void addEdge(Vertex edge) {
-		this.pnlEdges.addVertex(edge);
+		this.graphPanel.addVertex(edge);
 	}
 	
 	/**
@@ -56,7 +57,7 @@ public class TestGUI implements ActionListener {
 	 * 			new list of edges
 	 */
 	public void setEdges(List<Vertex> edges) {
-		this.pnlEdges.setEdges(edges);
+		this.graphPanel.setEdges(edges);
 	}
 	
 	/**
@@ -66,29 +67,9 @@ public class TestGUI implements ActionListener {
 		this.frame.setVisible(true);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		TestGUI drawer = new TestGUI();
-
-		drawer.init();
-		drawer.showFrame();
-	}
-	
 	
 	public static void main(String[] args) {		
-		//SAMPLE DATA
 
-		//first sample (edges) - not a complete triangulation
-		List<Vertex> edges = new ArrayList<Vertex>();
-		edges.add(new Vertex(new Point(10,100), new Point(50,50)));
-		edges.add(new Vertex(new Point(100,100), new Point(50,50)));
-		edges.add(new Vertex(new Point(300,100), new Point(50,50)));
-		edges.add(new Vertex(new Point(45,500), new Point(50,50)));
-		edges.add(new Vertex(new Point(45,100), new Point(50,50)));
-		edges.add(new Vertex(new Point(75,350), new Point(50,50)));
-		
-		//--------------------------------------------------------------------
-		
 		//second sample (all)
 		Point p111 = new Point(1,11);
 		Point p15 = new Point(1,5);
@@ -102,48 +83,48 @@ public class TestGUI implements ActionListener {
 		Point p1111 = new Point(11,11);
 		Point p28 = new Point(2,8);
 		
-		Vertex e1=new Vertex(p111, p15);
-		Vertex e2=new Vertex(p111, p59);
-		Vertex e3=new Vertex(p111, p711);
-		Vertex e4=new Vertex(p711, p1111);
-		Vertex e5=new Vertex(p711, p97);
-		Vertex e6=new Vertex(p59, p97);
-		Vertex e7=new Vertex(p1111, p97);
-		Vertex e8=new Vertex(p97, p113);
-		Vertex e9=new Vertex(p94, p113);
-		Vertex e10=new Vertex(p94, p97);
-		Vertex e11=new Vertex(p94, p51);
-		Vertex e12=new Vertex(p55, p94);
-		Vertex e13=new Vertex(p55, p97);
-		Vertex e14=new Vertex(p55, p59);
-		Vertex e15=new Vertex(p15, p55);
-		Vertex e16=new Vertex(p51, p55);
-		Vertex e17=new Vertex(p15, p51);
-		Vertex e18=new Vertex(p59, p711);
-		Vertex e19=new Vertex(p15, p59);
-		Vertex e20 = new Vertex(p51, p113);
-		Vertex e21 = new Vertex(p113, p1111);
+		Vertex v1=new Vertex(p111, p15);
+		Vertex v2=new Vertex(p111, p59);
+		Vertex v3=new Vertex(p111, p711);
+		Vertex v4=new Vertex(p711, p1111);
+		Vertex v5=new Vertex(p711, p97);
+		Vertex v6=new Vertex(p59, p97);
+		Vertex v7=new Vertex(p1111, p97);
+		Vertex v8=new Vertex(p97, p113);
+		Vertex v9=new Vertex(p94, p113);
+		Vertex v10=new Vertex(p94, p97);
+		Vertex v11=new Vertex(p94, p51);
+		Vertex v12=new Vertex(p55, p94);
+		Vertex v13=new Vertex(p55, p97);
+		Vertex v14=new Vertex(p55, p59);
+		Vertex v15=new Vertex(p15, p55);
+		Vertex v16=new Vertex(p51, p55);
+		Vertex v17=new Vertex(p15, p51);
+		Vertex v18=new Vertex(p59, p711);
+		Vertex v19=new Vertex(p15, p59);
+		Vertex v20 = new Vertex(p51, p113);
+		Vertex v21 = new Vertex(p113, p1111);
 		
-		Vertex e22 = new Vertex(p28, p15);
-		Vertex e23 = new Vertex(p28, p111);
-		Vertex e24 = new Vertex(p28, p59);
+		Vertex v22 = new Vertex(p28, p15);
+		Vertex v23 = new Vertex(p28, p111);
+		Vertex v24 = new Vertex(p28, p59);
 		
-		List<Vertex> all = new LinkedList<Vertex>();
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
 		
-		all.add(e1); all.add(e2); all.add(e3); all.add(e4); all.add(e5); all.add(e6);
-		all.add(e7); all.add(e8); all.add(e9); all.add(e10); all.add(e11); all.add(e12); 
-		all.add(e13); all.add(e14); all.add(e15); all.add(e16); all.add(e17); all.add(e18);
-		all.add(e19); all.add(e20); all.add(e21); all.add(e22); all.add(e23); all.add(e24); 
+		vertices.add(v1); vertices.add(v2); vertices.add(v3); vertices.add(v4); 
+		vertices.add(v5); vertices.add(v6); vertices.add(v7); vertices.add(v8); 
+		vertices.add(v9); vertices.add(v10); vertices.add(v11); vertices.add(v12); 
+		vertices.add(v13); vertices.add(v14); vertices.add(v15); vertices.add(v16);
+		vertices.add(v17); vertices.add(v18); vertices.add(v19); vertices.add(v20);
+		vertices.add(v21); vertices.add(v22); vertices.add(v23); vertices.add(v24); 
 		
-		
-		//=================================================================================
-		
-		//Call edge drawer...
-		TestGUI drawer = new TestGUI();
+
+		Graph graph = new Graph(null, vertices);
+		TestGUI drawer = new TestGUI(graph);
 		drawer.showFrame();
 		
 		//...with sample data "all" - you may also use "edges"
-		drawer.setEdges(all);
+		drawer.setEdges(vertices);
 	}
 	
 	
