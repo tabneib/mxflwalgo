@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import de.tud.ega.model.Edge;
+import de.tud.ega.model.Vertex;
 import de.tud.ega.model.Point;
 
 
@@ -46,8 +46,8 @@ public class TestGUI implements ActionListener {
 	 * @param edge
 	 * 			added edge
 	 */
-	public void addEdge(Edge edge) {
-		this.pnlEdges.addEdge(edge);
+	public void addEdge(Vertex edge) {
+		this.pnlEdges.addVertex(edge);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class TestGUI implements ActionListener {
 	 * @param edges
 	 * 			new list of edges
 	 */
-	public void setEdges(List<Edge> edges) {
+	public void setEdges(List<Vertex> edges) {
 		this.pnlEdges.setEdges(edges);
 	}
 	
@@ -65,16 +65,11 @@ public class TestGUI implements ActionListener {
 	public void showFrame () {
 		this.frame.setVisible(true);
 	}
-	
-	public void createTriangulation() {
 
-	}
-	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		TestGUI drawer = new TestGUI();
 
-		drawer.createTriangulation();
 		drawer.init();
 		drawer.showFrame();
 	}
@@ -84,13 +79,13 @@ public class TestGUI implements ActionListener {
 		//SAMPLE DATA
 
 		//first sample (edges) - not a complete triangulation
-		List<Edge> edges = new ArrayList<Edge>();
-		edges.add(new Edge(new Point(10,100), new Point(50,50)));
-		edges.add(new Edge(new Point(100,100), new Point(50,50)));
-		edges.add(new Edge(new Point(300,100), new Point(50,50)));
-		edges.add(new Edge(new Point(45,500), new Point(50,50)));
-		edges.add(new Edge(new Point(45,100), new Point(50,50)));
-		edges.add(new Edge(new Point(75,350), new Point(50,50)));
+		List<Vertex> edges = new ArrayList<Vertex>();
+		edges.add(new Vertex(new Point(10,100), new Point(50,50)));
+		edges.add(new Vertex(new Point(100,100), new Point(50,50)));
+		edges.add(new Vertex(new Point(300,100), new Point(50,50)));
+		edges.add(new Vertex(new Point(45,500), new Point(50,50)));
+		edges.add(new Vertex(new Point(45,100), new Point(50,50)));
+		edges.add(new Vertex(new Point(75,350), new Point(50,50)));
 		
 		//--------------------------------------------------------------------
 		
@@ -107,33 +102,33 @@ public class TestGUI implements ActionListener {
 		Point p1111 = new Point(11,11);
 		Point p28 = new Point(2,8);
 		
-		Edge e1=new Edge(p111, p15);
-		Edge e2=new Edge(p111, p59);
-		Edge e3=new Edge(p111, p711);
-		Edge e4=new Edge(p711, p1111);
-		Edge e5=new Edge(p711, p97);
-		Edge e6=new Edge(p59, p97);
-		Edge e7=new Edge(p1111, p97);
-		Edge e8=new Edge(p97, p113);
-		Edge e9=new Edge(p94, p113);
-		Edge e10=new Edge(p94, p97);
-		Edge e11=new Edge(p94, p51);
-		Edge e12=new Edge(p55, p94);
-		Edge e13=new Edge(p55, p97);
-		Edge e14=new Edge(p55, p59);
-		Edge e15=new Edge(p15, p55);
-		Edge e16=new Edge(p51, p55);
-		Edge e17=new Edge(p15, p51);
-		Edge e18=new Edge(p59, p711);
-		Edge e19=new Edge(p15, p59);
-		Edge e20 = new Edge(p51, p113);
-		Edge e21 = new Edge(p113, p1111);
+		Vertex e1=new Vertex(p111, p15);
+		Vertex e2=new Vertex(p111, p59);
+		Vertex e3=new Vertex(p111, p711);
+		Vertex e4=new Vertex(p711, p1111);
+		Vertex e5=new Vertex(p711, p97);
+		Vertex e6=new Vertex(p59, p97);
+		Vertex e7=new Vertex(p1111, p97);
+		Vertex e8=new Vertex(p97, p113);
+		Vertex e9=new Vertex(p94, p113);
+		Vertex e10=new Vertex(p94, p97);
+		Vertex e11=new Vertex(p94, p51);
+		Vertex e12=new Vertex(p55, p94);
+		Vertex e13=new Vertex(p55, p97);
+		Vertex e14=new Vertex(p55, p59);
+		Vertex e15=new Vertex(p15, p55);
+		Vertex e16=new Vertex(p51, p55);
+		Vertex e17=new Vertex(p15, p51);
+		Vertex e18=new Vertex(p59, p711);
+		Vertex e19=new Vertex(p15, p59);
+		Vertex e20 = new Vertex(p51, p113);
+		Vertex e21 = new Vertex(p113, p1111);
 		
-		Edge e22 = new Edge(p28, p15);
-		Edge e23 = new Edge(p28, p111);
-		Edge e24 = new Edge(p28, p59);
+		Vertex e22 = new Vertex(p28, p15);
+		Vertex e23 = new Vertex(p28, p111);
+		Vertex e24 = new Vertex(p28, p59);
 		
-		List<Edge> all = new LinkedList<Edge>();
+		List<Vertex> all = new LinkedList<Vertex>();
 		
 		all.add(e1); all.add(e2); all.add(e3); all.add(e4); all.add(e5); all.add(e6);
 		all.add(e7); all.add(e8); all.add(e9); all.add(e10); all.add(e11); all.add(e12); 
