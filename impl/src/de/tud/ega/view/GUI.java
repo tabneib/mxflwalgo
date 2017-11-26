@@ -14,13 +14,15 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import de.tud.ega.model.Graph;
-import de.tud.ega.model.Point;
+import de.tud.ega.model.GraphFactory;
 import de.tud.ega.model.Vertex;
+import de.tud.ega.model.Edge;
 
 public class GUI extends JFrame {
 
@@ -45,6 +47,10 @@ public class GUI extends JFrame {
 
 	// Data
 	Graph mGraph;
+	private static final int DEFAULT_VERTEX_NUMBER = 100;
+	private static final int DEFAULT_MAX_CAPACITY = 10;
+	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
+	private int maxCapacity = DEFAULT_MAX_CAPACITY;
 
 	public static void main(String[] args) {
 		new GUI();
@@ -118,8 +124,9 @@ public class GUI extends JFrame {
 	 */
 	private Container makeGraphContainer() {
 
-		mGraph = getSampleGraph();
-		GraphPanel graphPanel = new GraphPanel(mGraph.getVertices());
+		//mGraph = getSampleGraph();
+		mGraph = GraphFactory.getPlanarGraph(vertexNumber, maxCapacity);
+		GraphPanel graphPanel = new GraphPanel(mGraph.getEdges());
 
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
@@ -166,7 +173,7 @@ public class GUI extends JFrame {
 		c.gridwidth = 3;
 		panel.add(labelInsGen, c);
 
-		textFieldParams = new JTextField("params");
+		textFieldParams = new JTextField(vertexNumber + " " + maxCapacity);
 		c.gridx = 0;
 		c.gridy = 2;
 		c.gridwidth = 2;
@@ -182,7 +189,7 @@ public class GUI extends JFrame {
 		buttonInsGen.setMaximumSize(new Dimension(100, 30));
 		panel.add(buttonInsGen, c);
 
-		labelParams = new JLabel("[params]");
+		labelParams = new JLabel("<Vertices Number> <Max Capacity>");
 		labelParams.setFont(new Font("arial", Font.PLAIN, 11));
 		c.gridx = 0;
 		c.gridy = 4;
@@ -198,16 +205,35 @@ public class GUI extends JFrame {
 	 */
 	private void setListeners() {
 
-		// Radio buttons
 		buttonInsGen.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
+				// Parse arguments
+				final String[] argStrs = textFieldParams.getText().split(" ");
 
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 					@Override
 					public void run() {
+						
+						try {
+							if (argStrs.length != 2)
+								throw new Exception();
+							else{
+								vertexNumber = Integer.parseInt(argStrs[0]);
+								maxCapacity = Integer.parseInt(argStrs[1]);
+							}
+								
+						}
+						catch (Exception e) {
+							JOptionPane.showMessageDialog(null, "Invalid arguments", 
+									"Error", JOptionPane.ERROR_MESSAGE);
+						}
+						
+						textFieldParams.setText(vertexNumber + " " + maxCapacity);
+						
 						Component gContainer = frame.getContentPane().getComponent(0);
 						GridBagLayout l = (GridBagLayout) frame.getContentPane()
 								.getLayout();
@@ -224,77 +250,7 @@ public class GUI extends JFrame {
 	}
 
 	// ---------------------------------------------------------------------------------->
-	// Auxiliary
+	// Auxiliary Methods
 	// <----------------------------------------------------------------------------------
-
-	private Graph getSampleGraph() {
-		// second sample (all)
-		Point p111 = new Point(1, 11);
-		Point p15 = new Point(1, 5);
-		Point p51 = new Point(5, 1);
-		Point p59 = new Point(5, 9);
-		Point p55 = new Point(5, 5);
-		Point p711 = new Point(7, 11);
-		Point p94 = new Point(9, 4);
-		Point p97 = new Point(9, 7);
-		Point p113 = new Point(11, 3);
-		Point p1111 = new Point(11, 11);
-		Point p28 = new Point(2, 8);
-
-		Vertex v1 = new Vertex(p111, p15);
-		Vertex v2 = new Vertex(p111, p59);
-		Vertex v3 = new Vertex(p111, p711);
-		Vertex v4 = new Vertex(p711, p1111);
-		Vertex v5 = new Vertex(p711, p97);
-		Vertex v6 = new Vertex(p59, p97);
-		Vertex v7 = new Vertex(p1111, p97);
-		Vertex v8 = new Vertex(p97, p113);
-		Vertex v9 = new Vertex(p94, p113);
-		Vertex v10 = new Vertex(p94, p97);
-		Vertex v11 = new Vertex(p94, p51);
-		Vertex v12 = new Vertex(p55, p94);
-		Vertex v13 = new Vertex(p55, p97);
-		Vertex v14 = new Vertex(p55, p59);
-		Vertex v15 = new Vertex(p15, p55);
-		Vertex v16 = new Vertex(p51, p55);
-		Vertex v17 = new Vertex(p15, p51);
-		Vertex v18 = new Vertex(p59, p711);
-		Vertex v19 = new Vertex(p15, p59);
-		Vertex v20 = new Vertex(p51, p113);
-		Vertex v21 = new Vertex(p113, p1111);
-
-		Vertex v22 = new Vertex(p28, p15);
-		Vertex v23 = new Vertex(p28, p111);
-		Vertex v24 = new Vertex(p28, p59);
-
-		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-
-		vertices.add(v1);
-		vertices.add(v2);
-		vertices.add(v3);
-		vertices.add(v4);
-		vertices.add(v5);
-		vertices.add(v6);
-		vertices.add(v7);
-		vertices.add(v8);
-		vertices.add(v9);
-		vertices.add(v10);
-		vertices.add(v11);
-		vertices.add(v12);
-		vertices.add(v13);
-		vertices.add(v14);
-		vertices.add(v15);
-		vertices.add(v16);
-		vertices.add(v17);
-		vertices.add(v18);
-		vertices.add(v19);
-		vertices.add(v20);
-		vertices.add(v21);
-		vertices.add(v22);
-		vertices.add(v23);
-		vertices.add(v24);
-
-		return new Graph(null, vertices);
-	}
 
 }

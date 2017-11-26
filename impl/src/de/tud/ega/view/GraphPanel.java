@@ -11,8 +11,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import de.tud.ega.model.Edge;
 import de.tud.ega.model.Vertex;
-import de.tud.ega.model.Point;
 
 /**
  * JPanel for showing a list of vertices.
@@ -21,8 +21,8 @@ public class GraphPanel extends JPanel {
 
 	private static final long serialVersionUID = 1;
 
-	private List<Vertex> vertices;
-	private HashSet<Point> points = new HashSet<Point>();
+	private List<Edge> vertices;
+	private HashSet<Vertex> points = new HashSet<Vertex>();
 
 	private int offX = 25;
 	private int offY = 25;
@@ -34,7 +34,7 @@ public class GraphPanel extends JPanel {
 	 * will hold no element.
 	 */
 	public GraphPanel() {
-		this.vertices = new ArrayList<Vertex>();
+		this.vertices = new ArrayList<Edge>();
 		this.updatePoints();
 	}
 
@@ -45,7 +45,7 @@ public class GraphPanel extends JPanel {
 	 * @param edges
 	 *            list of edges
 	 */
-	public GraphPanel(List<Vertex> edges) {
+	public GraphPanel(List<Edge> edges) {
 		this.vertices = edges;
 		this.updatePoints();
 		this.updateScale();
@@ -64,21 +64,28 @@ public class GraphPanel extends JPanel {
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-		for (Vertex v : this.vertices) {
+		for (Edge v : this.vertices) {
 
-			// Draw the vertex
-			drawdArrow(g, Color.GRAY,
-					(int) (v.getStartPoint().x * this.scale + this.offX),
-					(int) (v.getStartPoint().y * this.scale + this.offY),
-					(int) (v.getEndPoint().x * this.scale + this.offX),
-					(int) (v.getEndPoint().y * this.scale + this.offY));
-
+			// Draw the edge
+			/*drawdArrow(g, Color.GRAY,
+					(int) (v.getStartVertex().x * this.scale + this.offX),
+					(int) (v.getStartVertex().y * this.scale + this.offY),
+					(int) (v.getEndVertex().x * this.scale + this.offX),
+					(int) (v.getEndVertex().y * this.scale + this.offY));*/
+			g.setColor(Color.GRAY);
+			g2d.drawLine(
+					(int) (v.getStartVertex().x * this.scale + this.offX),
+					(int) (v.getStartVertex().y * this.scale + this.offY),
+					(int) (v.getEndVertex().x * this.scale + this.offX),
+					(int) (v.getEndVertex().y * this.scale + this.offY));
+			
+			
 			// Draw the points
 			g2d.setColor(Color.BLACK);
-			g2d.fillOval((int) (v.getStartPoint().x * this.scale - 3 + this.offX),
-					(int) (v.getStartPoint().y * this.scale - 3 + this.offY), 6, 6);
-			g2d.fillOval((int) (v.getEndPoint().x * this.scale - 3 + this.offX),
-					(int) (v.getEndPoint().y * this.scale - 3 + this.offY), 6, 6);
+			g2d.fillOval((int) (v.getStartVertex().x * this.scale - 3 + this.offX),
+					(int) (v.getStartVertex().y * this.scale - 3 + this.offY), 6, 6);
+			g2d.fillOval((int) (v.getEndVertex().x * this.scale - 3 + this.offX),
+					(int) (v.getEndVertex().y * this.scale - 3 + this.offY), 6, 6);
 		}
 	}
 
@@ -89,7 +96,7 @@ public class GraphPanel extends JPanel {
 	 * @param vertex
 	 *            added vertex to list
 	 */
-	public void addVertex(Vertex vertex) {
+	public void addVertex(Edge vertex) {
 		this.vertices.add(vertex);
 		this.updatePoints();
 		this.updateScale();
@@ -103,7 +110,7 @@ public class GraphPanel extends JPanel {
 	 * @param vertices
 	 *            new list of vertices
 	 */
-	public void setEdges(List<Vertex> vertices) {
+	public void setEdges(List<Edge> vertices) {
 		this.vertices = vertices;
 		this.updateScale();
 		this.updatePoints();
@@ -117,9 +124,9 @@ public class GraphPanel extends JPanel {
 	private void updatePoints() {
 		this.points.clear();// delete all points
 
-		for (Vertex v : this.vertices) {
-			this.points.add(v.getStartPoint());
-			this.points.add(v.getEndPoint());
+		for (Edge v : this.vertices) {
+			this.points.add(v.getStartVertex());
+			this.points.add(v.getEndVertex());
 		}
 	}
 
@@ -127,17 +134,17 @@ public class GraphPanel extends JPanel {
 	 * 
 	 */
 	private void updateScale() {
-		Iterator<Vertex> iter = this.vertices.iterator();
+		Iterator<Edge> iter = this.vertices.iterator();
 		double maxX = 0;
 		double maxY = 0;
 
 		while (iter.hasNext()) {
-			Vertex item = iter.next();
-			maxX = Math.max(item.getStartPoint().x, maxX);
-			maxX = Math.max(item.getEndPoint().x, maxX);
+			Edge item = iter.next();
+			maxX = Math.max(item.getStartVertex().x, maxX);
+			maxX = Math.max(item.getEndVertex().x, maxX);
 
-			maxY = Math.max(item.getStartPoint().y, maxY);
-			maxY = Math.max(item.getEndPoint().y, maxY);
+			maxY = Math.max(item.getStartVertex().y, maxY);
+			maxY = Math.max(item.getEndVertex().y, maxY);
 		}
 
 		double scaleX = (this.getWidth() - this.offX - 10) / maxX;

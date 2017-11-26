@@ -1,6 +1,7 @@
 package de.tud.ega.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Class representing a graph
@@ -9,20 +10,20 @@ import java.util.ArrayList;
 public class Graph {
 
 
-	private ArrayList<Point> points;
-	private ArrayList<Vertex> vertices;
+	private HashSet<Vertex> vertices;
+	private ArrayList<Edge> edges;
 	
-	public Graph(ArrayList<Point> points, ArrayList<Vertex> vertices) {
-		this.points = points;
+	public Graph(HashSet<Vertex> vertices, ArrayList<Edge> edges) {
 		this.vertices = vertices;
+		this.edges = edges;
 	}
 
-	public ArrayList<Vertex> getVertices() {
+	public ArrayList<Edge> getEdges() {
+		return edges;
+	}
+
+	public HashSet<Vertex> getVertices() {
 		return vertices;
-	}
-
-	public ArrayList<Point> getPoints() {
-		return points;
 	}
 
 	// TODO: further functionalities

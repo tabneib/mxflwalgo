@@ -1,81 +1,58 @@
 package de.tud.ega.model;
 
+import java.awt.Point;
+
 /**
- * Class representing a vertex
- * 
+ * Class representing a 2D-point
  */
-public class Vertex {
 
-	private Point startPoint, endPoint;
-	private int capacity;
-
+public class Vertex extends Point {
+	
+	private static final long serialVersionUID = 1L;
+	
 	/**
-	 * Construct an vertex by two points and its capacity
+	 * Construct a point by its coordinates
 	 * 
-	 * @param startPoint
-	 * @param endPoint
+	 * @param x first coordinate
+	 * @param y second coordinate
 	 */
-	public Vertex(Point startPoint, Point endPoint, int capacity) {
-		this.startPoint = startPoint;
-		this.endPoint = endPoint;
-		this.setCapacity(capacity);
+	public Vertex(int x, int y) {
+		super(x,y);
+	}
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null || !(obj instanceof Vertex))
+			return false;
+		Vertex other = (Vertex) obj;
+		return this.x==other.x && this.y == other.y;
+	}
+	
+
+	@Override
+	public int hashCode()
+	{
+		long r = Math.round(x*100+y*10);
+		
+		if(r<Integer.MAX_VALUE)
+			return (int) r;
+		return Integer.MIN_VALUE+ (int) (r%Integer.MAX_VALUE);
 	}
 	
 	/**
-	 * Construct an edge by two points
+	 * Euclidian distance between two points
 	 * 
-	 * @param startPoint
-	 * @param endPoint
+	 * @param p second point
+	 * @return distance
 	 */
-	public Vertex(Point startPoint, Point endPoint) {
-		this.startPoint = startPoint;
-		this.endPoint = endPoint;
+	public double euclidDistance(Vertex p) {
+		return Math.sqrt((p.x-x)*(p.x-x) + (p.y-y)*(p.y-y));
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || !(o instanceof Vertex))
-			return false;
-
-		Vertex other = (Vertex) o;
-
-		// Check whether two edges have the same startpoint and endpoint.
-		return (other.getStartPoint().equals(this.getStartPoint()) &&
-				other.getEndPoint().equals(this.getEndPoint()));
-	}
-
-	@Override
-	public int hashCode() {
-		return  startPoint.hashCode() + endPoint.hashCode();
-	}
-
-
-	public Point getStartPoint() {
-		return startPoint;
-	}
-
-	public void setStartPoint(Point p1) {
-		this.startPoint = p1;
-	}
-
-	public Point getEndPoint() {
-		return endPoint;
-	}
-
-	public void setEndPoint(Point p2) {
-		this.endPoint = p2;
-	}
-
-	public int getCapacity() {
-		return capacity;
-	}
-
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}
-
+	
 	@Override
 	public String toString() {
-		return "Vertex(" + startPoint.toString() + " - " + endPoint.toString() + ")";
+		return "(" + Integer.toString(x) + ", " + Integer.toString(y) + ")";
 	}
 }

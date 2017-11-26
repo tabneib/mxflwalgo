@@ -10,9 +10,9 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import de.tud.ega.model.Vertex;
+import de.tud.ega.model.Edge;
 import de.tud.ega.model.Graph;
-import de.tud.ega.model.Point;
+import de.tud.ega.model.Vertex;
 
 
 
@@ -47,7 +47,7 @@ public class TestGUI{
 	 * @param edge
 	 * 			added edge
 	 */
-	public void addEdge(Vertex edge) {
+	public void addEdge(Edge edge) {
 		this.graphPanel.addVertex(edge);
 	}
 	
@@ -56,7 +56,7 @@ public class TestGUI{
 	 * @param edges
 	 * 			new list of edges
 	 */
-	public void setEdges(List<Vertex> edges) {
+	public void setEdges(List<Edge> edges) {
 		this.graphPanel.setEdges(edges);
 	}
 	
@@ -71,45 +71,45 @@ public class TestGUI{
 	public static void main(String[] args) {		
 
 		//second sample (all)
-		Point p111 = new Point(1,11);
-		Point p15 = new Point(1,5);
-		Point p51 = new Point(5,1);
-		Point p59 = new Point(5,9);
-		Point p55 = new Point(5,5);
-		Point p711 = new Point(7,11);
-		Point p94 = new Point(9,4);
-		Point p97 = new Point(9,7);
-		Point p113 = new Point(11,3);
-		Point p1111 = new Point(11,11);
-		Point p28 = new Point(2,8);
+		Vertex p111 = new Vertex(1,11);
+		Vertex p15 = new Vertex(1,5);
+		Vertex p51 = new Vertex(5,1);
+		Vertex p59 = new Vertex(5,9);
+		Vertex p55 = new Vertex(5,5);
+		Vertex p711 = new Vertex(7,11);
+		Vertex p94 = new Vertex(9,4);
+		Vertex p97 = new Vertex(9,7);
+		Vertex p113 = new Vertex(11,3);
+		Vertex p1111 = new Vertex(11,11);
+		Vertex p28 = new Vertex(2,8);
 		
-		Vertex v1=new Vertex(p111, p15);
-		Vertex v2=new Vertex(p111, p59);
-		Vertex v3=new Vertex(p111, p711);
-		Vertex v4=new Vertex(p711, p1111);
-		Vertex v5=new Vertex(p711, p97);
-		Vertex v6=new Vertex(p59, p97);
-		Vertex v7=new Vertex(p1111, p97);
-		Vertex v8=new Vertex(p97, p113);
-		Vertex v9=new Vertex(p94, p113);
-		Vertex v10=new Vertex(p94, p97);
-		Vertex v11=new Vertex(p94, p51);
-		Vertex v12=new Vertex(p55, p94);
-		Vertex v13=new Vertex(p55, p97);
-		Vertex v14=new Vertex(p55, p59);
-		Vertex v15=new Vertex(p15, p55);
-		Vertex v16=new Vertex(p51, p55);
-		Vertex v17=new Vertex(p15, p51);
-		Vertex v18=new Vertex(p59, p711);
-		Vertex v19=new Vertex(p15, p59);
-		Vertex v20 = new Vertex(p51, p113);
-		Vertex v21 = new Vertex(p113, p1111);
+		Edge v1=new Edge(p111, p15);
+		Edge v2=new Edge(p111, p59);
+		Edge v3=new Edge(p111, p711);
+		Edge v4=new Edge(p711, p1111);
+		Edge v5=new Edge(p711, p97);
+		Edge v6=new Edge(p59, p97);
+		Edge v7=new Edge(p1111, p97);
+		Edge v8=new Edge(p97, p113);
+		Edge v9=new Edge(p94, p113);
+		Edge v10=new Edge(p94, p97);
+		Edge v11=new Edge(p94, p51);
+		Edge v12=new Edge(p55, p94);
+		Edge v13=new Edge(p55, p97);
+		Edge v14=new Edge(p55, p59);
+		Edge v15=new Edge(p15, p55);
+		Edge v16=new Edge(p51, p55);
+		Edge v17=new Edge(p15, p51);
+		Edge v18=new Edge(p59, p711);
+		Edge v19=new Edge(p15, p59);
+		Edge v20 = new Edge(p51, p113);
+		Edge v21 = new Edge(p113, p1111);
 		
-		Vertex v22 = new Vertex(p28, p15);
-		Vertex v23 = new Vertex(p28, p111);
-		Vertex v24 = new Vertex(p28, p59);
+		Edge v22 = new Edge(p28, p15);
+		Edge v23 = new Edge(p28, p111);
+		Edge v24 = new Edge(p28, p59);
 		
-		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+		ArrayList<Edge> vertices = new ArrayList<Edge>();
 		
 		vertices.add(v1); vertices.add(v2); vertices.add(v3); vertices.add(v4); 
 		vertices.add(v5); vertices.add(v6); vertices.add(v7); vertices.add(v8); 
