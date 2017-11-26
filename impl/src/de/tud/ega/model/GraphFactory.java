@@ -3,7 +3,6 @@ package de.tud.ega.model;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -75,7 +74,6 @@ public class GraphFactory {
 				|| e1.getEndVertex().equals(e2.getEndVertex()))
 			return false;
 		else
-
 			return Line2D.linesIntersect(e1.getStartVertex().x, e1.getStartVertex().y,
 					e1.getEndVertex().x, e1.getEndVertex().y, e2.getStartVertex().x,
 					e2.getStartVertex().y, e2.getEndVertex().x, e2.getEndVertex().y);

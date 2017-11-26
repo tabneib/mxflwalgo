@@ -22,21 +22,12 @@ public class GraphPanel extends JPanel {
 	private static final long serialVersionUID = 1;
 
 	private List<Edge> vertices;
-	private HashSet<Vertex> points = new HashSet<Vertex>();
-
 	private int offX = 25;
 	private int offY = 25;
 	private double scale = 1.;
 	private final int ARROW_SIZE = 5;
 
-	/**
-	 * Creates a new JGraphPanel without a list of edges. So the list of edges
-	 * will hold no element.
-	 */
-	public GraphPanel() {
-		this.vertices = new ArrayList<Edge>();
-		this.updatePoints();
-	}
+	
 
 	/**
 	 * Creates a new JGraphPanel with a given list of edges and updates the
@@ -47,7 +38,6 @@ public class GraphPanel extends JPanel {
 	 */
 	public GraphPanel(List<Edge> edges) {
 		this.vertices = edges;
-		this.updatePoints();
 		this.updateScale();
 	}
 
@@ -90,47 +80,6 @@ public class GraphPanel extends JPanel {
 	}
 
 	/**
-	 * Method adds an vertex to the maintained list, updates the scale factor and
-	 * repaints the JPanel.
-	 * 
-	 * @param vertex
-	 *            added vertex to list
-	 */
-	public void addVertex(Edge vertex) {
-		this.vertices.add(vertex);
-		this.updatePoints();
-		this.updateScale();
-		this.repaint();
-	}
-
-	/**
-	 * Method sets the maintained list, updates the scale factor and repaints the
-	 * JPanel.
-	 * 
-	 * @param vertices
-	 *            new list of vertices
-	 */
-	public void setEdges(List<Edge> vertices) {
-		this.vertices = vertices;
-		this.updateScale();
-		this.updatePoints();
-		this.repaint();
-
-	}
-
-	/**
-	 * 
-	 */
-	private void updatePoints() {
-		this.points.clear();// delete all points
-
-		for (Edge v : this.vertices) {
-			this.points.add(v.getStartVertex());
-			this.points.add(v.getEndVertex());
-		}
-	}
-
-	/**
 	 * 
 	 */
 	private void updateScale() {
@@ -165,6 +114,7 @@ public class GraphPanel extends JPanel {
 	 * @param y2
 	 *            y-coordinate of the endpoint
 	 */
+	@SuppressWarnings("unused")
 	private void drawdArrow(final Graphics g1, Color color, int x1, int y1, int x2,
 			int y2) {
 		Graphics2D g = (Graphics2D) g1.create();
