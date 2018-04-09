@@ -10,19 +10,19 @@ import java.util.HashSet;
 public class Graph {
 
 
-	private HashSet<Vertex> vertices;
-	private ArrayList<Edge> edges;
+	private ArrayList<Vertex> vertices;
+	private ArrayList<Arc> arcs;
 	
-	public Graph(HashSet<Vertex> vertices, ArrayList<Edge> edges) {
+	public Graph(ArrayList<Vertex> vertices, ArrayList<Arc> arcs) {
 		this.vertices = vertices;
-		this.edges = edges;
+		this.arcs = arcs;
 	}
 
-	public ArrayList<Edge> getEdges() {
-		return edges;
+	public ArrayList<Arc> getArcs() {
+		return arcs;
 	}
 
-	public HashSet<Vertex> getVertices() {
+	public ArrayList<Vertex> getVertices() {
 		return vertices;
 	}
 

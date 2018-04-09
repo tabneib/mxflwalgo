@@ -4,15 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JPanel;
 
-import de.tud.ega.model.Edge;
-import de.tud.ega.model.Vertex;
+import de.tud.ega.model.Arc;
 
 /**
  * JPanel for showing a list of vertices.
@@ -21,23 +18,32 @@ public class GraphPanel extends JPanel {
 
 	private static final long serialVersionUID = 1;
 
-	private List<Edge> vertices;
+	private List<Arc> arcs;
 	private int offX = 25;
 	private int offY = 25;
 	private double scale = 1.;
-	private final int ARROW_SIZE = 5;
+	
+	/**
+	 * 
+	 */
+	private final int ARROW_HEAD_SIZE = 8;
+	
+	/**
+	 * 
+	 */
+	private final double ARROW_HEAD_POSITION = 0.3;
 
 	
 
 	/**
-	 * Creates a new JGraphPanel with a given list of edges and updates the
+	 * Creates a new JGraphPanel with a given list of arcs and updates the
 	 * scale factor.
 	 * 
-	 * @param edges
-	 *            list of edges
+	 * @param arcs
+	 *            list of arcs
 	 */
-	public GraphPanel(List<Edge> edges) {
-		this.vertices = edges;
+	public GraphPanel(List<Arc> arcs) {
+		this.arcs = arcs;
 		this.updateScale();
 	}
 
@@ -54,15 +60,15 @@ public class GraphPanel extends JPanel {
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-		for (Edge v : this.vertices) {
-
-			// Draw the edge
-			/*drawdArrow(g, Color.GRAY,
+		for (Arc v : this.arcs) {
+			// Draw the arc
+			drawdArrowHead(g, Color.BLACK,
 					(int) (v.getStartVertex().x * this.scale + this.offX),
 					(int) (v.getStartVertex().y * this.scale + this.offY),
 					(int) (v.getEndVertex().x * this.scale + this.offX),
-					(int) (v.getEndVertex().y * this.scale + this.offY));*/
-			g.setColor(Color.GRAY);
+					(int) (v.getEndVertex().y * this.scale + this.offY),
+					false);
+			g.setColor(Color.BLACK);
 			g2d.drawLine(
 					(int) (v.getStartVertex().x * this.scale + this.offX),
 					(int) (v.getStartVertex().y * this.scale + this.offY),
@@ -71,7 +77,7 @@ public class GraphPanel extends JPanel {
 			
 			
 			// Draw the points
-			g2d.setColor(Color.BLACK);
+			g2d.setColor(Color.RED);
 			g2d.fillOval((int) (v.getStartVertex().x * this.scale - 3 + this.offX),
 					(int) (v.getStartVertex().y * this.scale - 3 + this.offY), 6, 6);
 			g2d.fillOval((int) (v.getEndVertex().x * this.scale - 3 + this.offX),
@@ -83,12 +89,12 @@ public class GraphPanel extends JPanel {
 	 * 
 	 */
 	private void updateScale() {
-		Iterator<Edge> iter = this.vertices.iterator();
+		Iterator<Arc> iter = this.arcs.iterator();
 		double maxX = 0;
 		double maxY = 0;
 
 		while (iter.hasNext()) {
-			Edge item = iter.next();
+			Arc item = iter.next();
 			maxX = Math.max(item.getStartVertex().x, maxX);
 			maxX = Math.max(item.getEndVertex().x, maxX);
 
@@ -113,36 +119,46 @@ public class GraphPanel extends JPanel {
 	 *            x-coordinate of the endpoint
 	 * @param y2
 	 *            y-coordinate of the endpoint
+	 * @param rotate
+	 * 			  optional rotation regarding the direction defined by start- & endpoints
 	 */
-	@SuppressWarnings("unused")
-	private void drawdArrow(final Graphics g1, Color color, int x1, int y1, int x2,
-			int y2) {
+	private void drawdArrowHead(final Graphics g1, Color color, int x1, int y1, int x2,
+			int y2, boolean rotate) {
 		Graphics2D g = (Graphics2D) g1.create();
 		g.setColor(color);
+		
+		if (rotate) {
+			int tmp = x1;
+			x1 = x2;
+			x2 = tmp;
+			tmp = y1;
+			y1 = y2;
+			y2 = tmp;
+		}
 
 		double dx = x2 - x1, dy = y2 - y1;
 		double len = Math.sqrt(dx * dx + dy * dy);
 		double cos = dx / len;
 		double sin = dy / len;
 		// shorten the length to make things not overlapping
-		x2 = (int) (x2 - ARROW_SIZE * cos);
-		y2 = (int) (y2 - ARROW_SIZE * sin);
+		x2 = (int) (x2 - len * ARROW_HEAD_POSITION * cos);
+		y2 = (int) (y2 - len * ARROW_HEAD_POSITION * sin);
 		
 		// recalculate based on new length
 		dx = x2 - x1;
 		dy = y2 - y1;
 		len = Math.sqrt(dx * dx + dy * dy);
 		
-		g.drawLine(x1, y1, x2, y2);
+		//g.drawLine(x1, y1, x2, y2);
 
 		double angle = Math.atan2(dy, dx);
 		AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
 		at.concatenate(AffineTransform.getRotateInstance(angle));
 		g.transform(at);
 
-		g.fillPolygon(new int[] { (int) len, (int) len - ARROW_SIZE,
-				(int) len - ARROW_SIZE, (int) len },
-				new int[] { 0, -ARROW_SIZE, ARROW_SIZE, 0 }, 4);
+		g.fillPolygon(new int[] { (int) len, (int) len - ARROW_HEAD_SIZE,
+				(int) len - ARROW_HEAD_SIZE, (int) len },
+				new int[] { 0, -ARROW_HEAD_SIZE/2, ARROW_HEAD_SIZE/2, 0 }, 4);
 	}
 
 }

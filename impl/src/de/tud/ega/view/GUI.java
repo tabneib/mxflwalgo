@@ -9,7 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,8 +20,6 @@ import javax.swing.JTextField;
 
 import de.tud.ega.model.Graph;
 import de.tud.ega.model.GraphFactory;
-import de.tud.ega.model.Vertex;
-import de.tud.ega.model.Edge;
 
 public class GUI extends JFrame {
 
@@ -125,8 +122,14 @@ public class GUI extends JFrame {
 	private Container makeGraphContainer() {
 
 		//mGraph = getSampleGraph();
-		mGraph = GraphFactory.getPlanarGraph(vertexNumber, maxCapacity);
-		GraphPanel graphPanel = new GraphPanel(mGraph.getEdges());
+		try {
+			mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
+					JOptionPane.INFORMATION_MESSAGE);
+			e.printStackTrace();
+		}
+		GraphPanel graphPanel = new GraphPanel(mGraph.getArcs());
 
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
