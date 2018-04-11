@@ -101,8 +101,15 @@ public class GraphFactory {
 		for (ArrayList<Vertex> row : vertices)
 			v.addAll(row);
 
-		System.out.println("Graph Factory: New Graph Created!\n#Vertices: "
-		+ v.size() + "\n#Arcs = " + arcs.size());
+		// For each arc, insert the corresponding reversed arc
+		ArrayList<Arc> reversedArcs = new ArrayList<>();
+		for (Arc arc: arcs)
+			reversedArcs.add(new Arc(arc.getEndVertex(), 
+					arc.getStartVertex(), random.nextInt(maxCapacity)));
+		arcs.addAll(reversedArcs);
+		
+		System.out.println("[Graph Factory] New Graph Created. (V,A) = ("
+		+ v.size() + ", " + arcs.size() + ")");
 		
 		return new Graph(v, arcs);
 	}

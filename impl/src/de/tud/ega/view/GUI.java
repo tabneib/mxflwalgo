@@ -27,7 +27,7 @@ public class GUI extends JFrame {
 
 	// GUI Constants
 	public static final int WINDOW_HEIGHT = 650;
-	public static final int BOXES_CONTAINER_WIDTH = 900;
+	public static final int GRAPH_CONTAINER_WIDTH = 900;
 	public static final int MENU_CONTAINER_WIDTH = 380;
 	public static final int BOXES_PADDING = 10;
 	public static final int SCROLL_VIEW_PADDING = 20;
@@ -44,7 +44,7 @@ public class GUI extends JFrame {
 
 	// Data
 	Graph mGraph;
-	private static final int DEFAULT_VERTEX_NUMBER = 100;
+	private static final int DEFAULT_VERTEX_NUMBER = 39;
 	private static final int DEFAULT_MAX_CAPACITY = 10;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
@@ -69,7 +69,7 @@ public class GUI extends JFrame {
 		frame = new JFrame("EGA GUI");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(
-				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING + MENU_CONTAINER_WIDTH,
+				GRAPH_CONTAINER_WIDTH + SCROLL_VIEW_PADDING + MENU_CONTAINER_WIDTH,
 				WINDOW_HEIGHT));
 		addComponentsToPane(frame.getContentPane());
 
@@ -115,7 +115,7 @@ public class GUI extends JFrame {
 	}
 
 	/**
-	 * Create a panel that displays all the boxes
+	 * Create a panel that displays the graph
 	 * 
 	 * @return
 	 */
@@ -129,12 +129,12 @@ public class GUI extends JFrame {
 					JOptionPane.INFORMATION_MESSAGE);
 			e.printStackTrace();
 		}
-		GraphPanel graphPanel = new GraphPanel(mGraph.getArcs());
+		GraphPanel graphPanel = new GraphPanel(mGraph);
 
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
 		scrollPane.setPreferredSize(new Dimension(
-				BOXES_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
+				GRAPH_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
 
 		// Update the status bar
 		// labelStatusBar.setText(" #Box: " + boxes.size() + " #Rect: "

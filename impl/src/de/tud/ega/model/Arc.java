@@ -1,17 +1,24 @@
 package de.tud.ega.model;
 
-import java.awt.event.AWTEventListener;
-
 /**
  * Class representing a vertex
  * 
  */
 public class Arc implements Comparable<Arc>{
 
+	public int getCapacity() {
+		return capacity;
+	}
+
+	public int getFlow() {
+		return flow;
+	}
+
 	private Vertex startVertex, endVertex;
 	public final int capacity;
 	private int flow;
 	public int length;
+	Direction direction = null;
 
 	/**
 	 * Construct an edge by two points and its capacity
@@ -25,6 +32,38 @@ public class Arc implements Comparable<Arc>{
 		this.capacity = capacity;
 		this.length = (int) Math.sqrt(Math.pow(endVertex.x - startVertex.x, 2)
 				+ Math.pow(endVertex.y - startVertex.y, 2));
+	}
+	
+	/**
+	 * Get the direction of this arc
+	 * @return
+	 */
+	public Direction getDirection() {
+		if (this.direction != null)
+			return this.direction;
+		
+		if (this.getStartVertex().x == this.endVertex.x) {
+			if (this.getStartVertex().y < this.endVertex.y)
+				this.direction = Direction.VERTICAL_DOWN;
+			else
+				this.direction = Direction.VERTICAL_UP;
+		}
+		else if (this.getStartVertex().x > this.endVertex.x) {
+				if (this.getStartVertex().y == this.endVertex.y)
+					this.direction = Direction.HORIZONTAL_TO_LEFT;
+				else if (this.getStartVertex().y > this.endVertex.y)
+					this.direction = Direction.DIAGONAL_TO_TOPLEFT;
+				else
+					this.direction = Direction.DIAGONAL_TO_BOTTOMLEFT;
+			}
+			else if (this.getStartVertex().y == this.endVertex.y)
+				this.direction = Direction.HORIZONTAL_TO_RIGHT;
+			else if (this.getStartVertex().y > this.endVertex.y)
+				this.direction = Direction.DIAGONAL_TO_TOPRIGHT;
+			else
+				this.direction = Direction.DIAGONAL_TO_BOTTOMRIGHT;
+		
+		return this.direction;
 	}
 
 	@Override
@@ -74,5 +113,19 @@ public class Arc implements Comparable<Arc>{
 			return 1;
 		return 0;
 			
+	}
+	
+	/**
+	 * Possible directions of the arcs
+	 */
+	public enum Direction {
+		HORIZONTAL_TO_RIGHT,
+		HORIZONTAL_TO_LEFT,
+		VERTICAL_UP,
+		VERTICAL_DOWN,
+		DIAGONAL_TO_TOPRIGHT,
+		DIAGONAL_TO_TOPLEFT,
+		DIAGONAL_TO_BOTTOMRIGHT,
+		DIAGONAL_TO_BOTTOMLEFT
 	}
 }
