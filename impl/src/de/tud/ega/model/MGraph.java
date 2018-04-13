@@ -25,6 +25,13 @@ public class MGraph {
 		return vertices;
 	}
 
+	public String toString() {
+		String str = "MGraph[" + vertices.size() + ", " + arcs.size() + "]\n";
+		for (Arc a : arcs) 
+			str += a.toString() + "\t";
+		
+		return str;
+	}
 	// TODO: further functionalities: Lists of arcs & nodes that should be highlighted for the purpose of
 	// describing intermediate steps of the algorithms
 	

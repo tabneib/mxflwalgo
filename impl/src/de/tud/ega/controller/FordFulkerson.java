@@ -45,34 +45,20 @@ public class FordFulkerson extends MaxFlowAlgo{
 	 */
 	private void createResGraph() {
 		ArrayList<Arc> arcs = new ArrayList<>();
-		ResArc a;
 		for (Arc arc : this.problem.getGraph().getArcs()) {
 			MArc mArc = (MArc) arc;
-			if (mArc.getFlow() == 0){
-				a = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(), mArc.getCapacity(), 
-						null, mArc);
-				arcs.add(a);
-				mArc.getStartVertex().addResIncidentArc(a);
-			}
-			else if (mArc.getFlow() == mArc.getCapacity()){
-				a = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(), mArc.getCapacity(),
-						null, mArc);
-				arcs.add(a);
-				mArc.getEndVertex().addResIncidentArc(a);
-			}
-			else{
-				ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(), 
-						mArc.getCapacity() - mArc.getFlow(), null, mArc);
-				
-				
-				ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(), 
-						mArc.getFlow(), forward, mArc);
-				forward.setBackwardResArc(backward);
-				arcs.add(forward);
-				arcs.add(backward);
-				mArc.getStartVertex().addResIncidentArc(forward);
-				mArc.getEndVertex().addResIncidentArc(backward);
-			}
+			
+			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(), 
+					mArc.getCapacity() - mArc.getFlow(), null, arc, true);
+			
+			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(), 
+					mArc.getFlow(), forward, arc, false);
+			
+			forward.setBackwardResArc(backward);
+			arcs.add(forward);
+			arcs.add(backward);
+			mArc.getStartVertex().addResIncidentArc(forward);
+			mArc.getEndVertex().addResIncidentArc(backward);
 		}
 		this.resGraph = new MGraph(this.problem.getGraph().getVertices(), arcs);
 	}
@@ -84,17 +70,11 @@ public class FordFulkerson extends MaxFlowAlgo{
 	 */
 	private void updateResGraph(AugmentingPath augPath) {
 		for (ResArc arc : augPath.arcs) {
-			if (arc.getResValue() > augPath.value) {
+			if (arc.getResValue() >= augPath.value) {
 				arc.setResValue(arc.getResValue() - augPath.value);
 				// Update the backward arc
 				arc.getBackwardResArc().setResValue(
 					arc.getBackwardResArc().getResValue() + augPath.value);
-			}
-			else if (arc.getResValue() == augPath.value) {
-				arc.getStartVertex().removeResIncidentArc(arc);
-					// Update the backward arc
-				arc.getBackwardResArc().setResValue(arc.getResValue() + augPath.value);
-				this.resGraph.getArcs().remove(arc);
 			}
 			else
 				throw new RuntimeException("Invalid augmenting value!");
@@ -108,8 +88,12 @@ public class FordFulkerson extends MaxFlowAlgo{
 	 * 				The given graph augmenting path
 	 */
 	private void updateGraph(AugmentingPath path) {
-		for (ResArc arc : path.arcs) 
-			arc.getOriginalArc().setFlow(arc.getOriginalArc().getFlow() + path.value);
+		for (ResArc arc : path.arcs) {
+			if (arc.isForward())
+				((MArc) arc.getOriginalArc()).setFlow(((MArc)arc.getOriginalArc()).getFlow() + path.value);
+			else
+				((MArc) arc.getOriginalArc()).setFlow(((MArc)arc.getOriginalArc()).getFlow() - path.value);
+		}
 	}
 	
 	
@@ -120,7 +104,8 @@ public class FordFulkerson extends MaxFlowAlgo{
 	private AugmentingPath dfs() {
 		long searchId = System.currentTimeMillis();
 		this.problem.getSource().setSeen(searchId);
-		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(), 0, searchId);
+		return recDfs(this.resGraph.getVertices().get(0), 
+				new ArrayList<ResArc>(), Integer.MAX_VALUE, searchId);
 	
 	}
 	/**
@@ -138,12 +123,13 @@ public class FordFulkerson extends MaxFlowAlgo{
 	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath, 
 			int augmentingValue, long searchId) {
 		for (ResArc arc : currentNode.getResIncidentArcs()) {
-			if (arc.getEndVertex().equals(this.problem.getTarget())) {
+			if (arc.getResValue() > 0 && 
+					arc.getEndVertex().equals(this.problem.getTarget())) {
 				currentPath.add(arc);
 				return new AugmentingPath(currentPath, 
 						Math.min(augmentingValue, arc.getResValue()));
 			}
-			else if (!arc.getEndVertex().isSeen(searchId)) {
+			else if (arc.getResValue() > 0 && !arc.getEndVertex().isSeen(searchId)) {
 				arc.getEndVertex().setSeen(searchId);
 				currentPath.add(arc);
 				AugmentingPath res = recDfs(arc.getEndVertex(), 

@@ -6,9 +6,8 @@ package de.tud.ega.model;
  */
 public class MArc extends Arc {
 
-	private MVertex startVertex, endVertex;
 	private int capacity;
-	private int flow;
+	private int flow = 0;
 	public int length;
 	Direction direction = null;
 

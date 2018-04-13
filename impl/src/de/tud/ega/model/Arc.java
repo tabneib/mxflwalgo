@@ -2,7 +2,8 @@ package de.tud.ega.model;
 
 public abstract class Arc implements Comparable<Arc>{
 
-	private MVertex startVertex, endVertex;
+	protected MVertex startVertex;
+	protected MVertex endVertex;
 	public int length;
 	Direction direction = null;
 

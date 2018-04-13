@@ -10,15 +10,20 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import de.tud.ega.model.MGraph;
+import de.tud.ega.model.MaxFlowProblem;
+import de.tud.ega.controller.FordFulkerson;
+import de.tud.ega.controller.MaxFlowAlgo;
 import de.tud.ega.model.GraphFactory;
 
 public class GUI extends JFrame {
@@ -31,6 +36,11 @@ public class GUI extends JFrame {
 	public static final int MENU_CONTAINER_WIDTH = 380;
 	public static final int BOXES_PADDING = 10;
 	public static final int SCROLL_VIEW_PADDING = 20;
+	
+	private static final String FORD_FULKERSON = "FORD_FULKERSON";
+	private static final String EDMONDS_KARP = "EDMONDS_KARP";
+	private static final String DINIC = "DINIC";
+	private static final String GOLDBERG_TARJAN = "GOLDBERG_TARJAN";
 
 	// GUI Components
 	private JLabel labelStatusBar;
@@ -39,16 +49,29 @@ public class GUI extends JFrame {
 	private JTextField textFieldParams;
 	private JButton buttonInsGen;
 	private JLabel labelParams;
+	private JLabel labelAlgo;
+	private JRadioButton radioFordFulkerson;
+	private JRadioButton radioEdmondsKarp;
+	private JRadioButton radioDinic;
+	private JRadioButton radioGoldbergTarjan;
+	private JButton buttonRun;
+	private JButton buttonRunStep;
+	private ButtonGroup buttonGroupAlgo;
 
 	private final Font defaultFont = new JLabel().getFont();
 
 	// Data
 	MGraph mGraph;
-	private static final int DEFAULT_VERTEX_NUMBER = 39;
+	//private static final int DEFAULT_VERTEX_NUMBER = 39;
+	private static final int DEFAULT_VERTEX_NUMBER = 6;
 	private static final int DEFAULT_MAX_CAPACITY = 10;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
 
+	@Deprecated
+	private String algoName;
+	private MaxFlowAlgo algorith;
+	
 	public static void main(String[] args) {
 		new GUI();
 	}
@@ -98,7 +121,7 @@ public class GUI extends JFrame {
 		// The container of all the boxes
 		c.weightx = 1.0;
 		c.gridx = 0;
-		pane.add(makeGraphContainer(), c);
+		pane.add(makeGraphContainer(null), c);
 
 		// The container of the menu
 		c.weightx = 0.5;
@@ -119,18 +142,31 @@ public class GUI extends JFrame {
 	 * 
 	 * @return
 	 */
-	private Container makeGraphContainer() {
+	private Container makeGraphContainer(MGraph graph) {
 
+		GraphPanel graphPanel;
 		//mGraph = getSampleGraph();
-		try {
-			mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
-					JOptionPane.INFORMATION_MESSAGE);
-			e.printStackTrace();
-		}
-		GraphPanel graphPanel = new GraphPanel(mGraph);
+		if (graph == null) {
+			try {
+				mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
+						JOptionPane.INFORMATION_MESSAGE);
+				e.printStackTrace();
+			}
+			graphPanel = new GraphPanel(mGraph);
 
+			if (this.algorith != null){
+				buttonGroupAlgo.clearSelection();
+				buttonRun.setEnabled(false);
+				buttonRunStep.setEnabled(false);
+				this.algorith = null;
+			}
+		}
+		else {
+			graphPanel = new GraphPanel(graph);
+		}
+			
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
 		scrollPane.setPreferredSize(new Dimension(
@@ -191,9 +227,72 @@ public class GUI extends JFrame {
 		labelParams = new JLabel("<Vertices Number> <Max Capacity>");
 		labelParams.setFont(new Font("arial", Font.PLAIN, 11));
 		c.gridx = 0;
-		c.gridy = 4;
+		c.gridy = 3;
 		c.gridwidth = 2;
 		panel.add(labelParams, c);
+		
+		
+		// Algos
+
+		labelAlgo = new JLabel("Algorithm");
+		labelAlgo.setFont(new Font(defaultFont.getFontName(), Font.BOLD,
+				defaultFont.getSize() + 2));
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 3;
+		panel.add(labelAlgo, c);
+		
+		radioFordFulkerson = new JRadioButton("Ford-Fulkerson");
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		panel.add(radioFordFulkerson, c);
+		
+		radioEdmondsKarp = new JRadioButton("Edmonds-Karp");
+		c.gridx = 1;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		panel.add(radioEdmondsKarp, c);
+			
+		radioDinic = new JRadioButton("Dinic");
+		c.gridx = 0;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		panel.add(radioDinic, c);
+		
+		radioGoldbergTarjan = new JRadioButton("Goldberg-Tarjan");
+		c.gridx = 1;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		panel.add(radioGoldbergTarjan, c);
+			
+		buttonGroupAlgo = new ButtonGroup();
+		buttonGroupAlgo.add(radioFordFulkerson);
+		buttonGroupAlgo.add(radioEdmondsKarp);
+		buttonGroupAlgo.add(radioDinic);
+		buttonGroupAlgo.add(radioGoldbergTarjan);
+		//radioFordFulkerson.setSelected(true);
+
+		buttonRunStep = new JButton("1 Step");
+		c.gridx = 0;
+		c.gridy = 8;
+		c.gridwidth = 1;
+		buttonRunStep.setPreferredSize(new Dimension(100, 30));
+		panel.add(buttonRunStep, c);
+		buttonRunStep.setEnabled(false);
+		
+		buttonRun = new JButton("Run");
+		c.gridx = 1;
+		c.gridy = 8;
+		c.gridwidth = 1;
+		buttonRun.setPreferredSize(new Dimension(100, 30));
+		panel.add(buttonRun, c);
+		buttonRun.setEnabled(false);
+		
+		// TODO: remove this when all features are implemented
+		radioEdmondsKarp.setEnabled(false);
+		radioDinic.setEnabled(false);
+		radioGoldbergTarjan.setEnabled(false);
 
 		setListeners();
 		return panel;
@@ -239,17 +338,70 @@ public class GUI extends JFrame {
 						GridBagConstraints c = l.getConstraints(gContainer);
 
 						frame.getContentPane().remove(gContainer);
-						frame.getContentPane().add(makeGraphContainer(), c, 0);
+						frame.getContentPane().add(makeGraphContainer(null), c, 0);
 						frame.getContentPane().validate();
 					}
 				});
 
 			}
 		});
+
+		radioFordFulkerson.addActionListener(new AlgorithmSelectListener());
+		radioEdmondsKarp.addActionListener(new AlgorithmSelectListener());
+		radioDinic.addActionListener(new AlgorithmSelectListener());
+		radioGoldbergTarjan.addActionListener(new AlgorithmSelectListener());
+		
+		buttonRun.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+
+						Component gContainer = frame.getContentPane().getComponent(0);
+						GridBagLayout l = (GridBagLayout) frame.getContentPane()
+								.getLayout();
+						GridBagConstraints c = l.getConstraints(gContainer);
+
+						frame.getContentPane().remove(gContainer);
+						frame.getContentPane().add(makeGraphContainer(algorith.run()), c, 0);
+						frame.getContentPane().validate();
+					}
+				});
+			}
+		});
+		
 	}
 
-	// ---------------------------------------------------------------------------------->
-	// Auxiliary Methods
-	// <----------------------------------------------------------------------------------
+	
+	private class AlgorithmSelectListener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (radioFordFulkerson.isSelected()) {
+				algoName = FORD_FULKERSON;
+				buttonRun.setEnabled(true);
+				algorith = new FordFulkerson(new MaxFlowProblem(mGraph));
+			}
+			else if (radioEdmondsKarp.isSelected()) {
+				algoName = EDMONDS_KARP;
+				// TODO
+			}
+			else if (radioDinic.isSelected()) {
+				algoName = DINIC;
+				// TODO
+			}
+			else if (radioGoldbergTarjan.isSelected()) {
+				algoName = GOLDBERG_TARJAN;
+				// TODO
+			}
+			else
+				throw new RuntimeException("Unknown chosen algorithm!");
+			
+		}
+	}
+	
+	
 }

@@ -35,6 +35,7 @@ public class MVertex extends Point {
 	public MVertex(int x, int y) {
 		super(x,y);
 		this.incidentArcs = new ArrayList<>();
+		this.resIncidentArcs = new ArrayList<>();
 		this.searchId = -1;
 	}
 	
