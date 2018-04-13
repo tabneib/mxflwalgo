@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import de.tud.ega.model.Graph;
+import de.tud.ega.model.MGraph;
 import de.tud.ega.model.GraphFactory;
 
 public class GUI extends JFrame {
@@ -43,7 +43,7 @@ public class GUI extends JFrame {
 	private final Font defaultFont = new JLabel().getFont();
 
 	// Data
-	Graph mGraph;
+	MGraph mGraph;
 	private static final int DEFAULT_VERTEX_NUMBER = 39;
 	private static final int DEFAULT_MAX_CAPACITY = 10;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
@@ -135,10 +135,6 @@ public class GUI extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
 		scrollPane.setPreferredSize(new Dimension(
 				GRAPH_CONTAINER_WIDTH + SCROLL_VIEW_PADDING, WINDOW_HEIGHT));
-
-		// Update the status bar
-		// labelStatusBar.setText(" #Box: " + boxes.size() + " #Rect: "
-		// + mInstance.getRechtangles().size() + " boxLength: " + boxLength);
 
 		return scrollPane;
 	}

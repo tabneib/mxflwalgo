@@ -14,8 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.tud.ega.model.Arc;
-import de.tud.ega.model.Graph;
-import de.tud.ega.model.Vertex;
+import de.tud.ega.model.MArc;
+import de.tud.ega.model.MGraph;
+import de.tud.ega.model.MVertex;
 
 /**
  * JPanel for displaying and updating a beautiful graph
@@ -72,10 +73,10 @@ public class GraphPanel extends JPanel {
 	private static final double SMALL_SCALE = 0.71;
 
 	private ArrayList<Arc> arcs;
-	private ArrayList<Vertex> vertices;
+	private ArrayList<MVertex> vertices;
 	private ArrayList<Line> lines;
 	private ArrayList<Node> nodes;
-	private HashMap<Vertex, Node> vertexToNode;
+	private HashMap<MVertex, Node> vertexToNode;
 	private HashMap<Arc, Line> arcToLine;
 
 	/**
@@ -95,7 +96,7 @@ public class GraphPanel extends JPanel {
 	 * @param arcs
 	 *            list of arcs
 	 */
-	public GraphPanel(Graph graph) {
+	public GraphPanel(MGraph graph) {
 		this.arcs = graph.getArcs();
 		this.vertices = graph.getVertices();
 		this.scaleUpdated = false;
@@ -113,7 +114,7 @@ public class GraphPanel extends JPanel {
 		// Create mapping from vertices to nodes
 		this.nodes = new ArrayList<>();
 		this.vertexToNode = new HashMap<>();
-		for (Vertex vertex : this.vertices) {
+		for (MVertex vertex : this.vertices) {
 			Node n = new Node(vertex.x, vertex.y, NODE_COLOR);
 			this.nodes.add(n);
 			this.vertexToNode.put(vertex, n);
@@ -138,7 +139,7 @@ public class GraphPanel extends JPanel {
 		for (Arc arc : this.arcs)
 			this.drawArc(g2d, arc);
 
-		for (Vertex vertex : this.vertices)
+		for (MVertex vertex : this.vertices)
 			this.drawVertex(g2d, vertex);
 	}
 
@@ -160,7 +161,7 @@ public class GraphPanel extends JPanel {
 	 * @param g
 	 * @param vertex
 	 */
-	private void drawVertex(final Graphics2D g, Vertex vertex) {
+	private void drawVertex(final Graphics2D g, MVertex vertex) {
 		if (!this.vertices.contains(vertex))
 			throw new RuntimeException("Cannot draw an unknown vertex: " + vertex);
 		this.vertexToNode.get(vertex).draw(g);
@@ -200,8 +201,6 @@ public class GraphPanel extends JPanel {
 		dx = x2 - x1;
 		dy = y2 - y1;
 		len = Math.sqrt(dx * dx + dy * dy);
-
-		// g.drawLine(x1, y1, x2, y2);
 
 		double angle = Math.atan2(dy, dx);
 		AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
@@ -265,7 +264,10 @@ public class GraphPanel extends JPanel {
 			this.x2 = x2;
 			this.y2 = y2;
 			this.color = color;
-			this.label = new JLabel(arc.getFlow() + "|" + arc.getCapacity());
+			if (this.arc instanceof MArc)
+				this.label = new JLabel(
+						((MArc) arc).getFlow() + "|" + ((MArc) arc).getCapacity());
+			// else: TODO
 		}
 
 		/**
@@ -311,8 +313,6 @@ public class GraphPanel extends JPanel {
 			// Set the label's font size to the newly determined size.
 			label.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
 			
-			//label.setOpaque(true);
-			//label.setBackground(NODE_COLOR);
 			switch (this.arc.getDirection()) {
 			case HORIZONTAL_TO_RIGHT:
 				label.setLocation((int) (arrowHeadPos.x - 2 * ARROW_HEAD_SIZE), 
@@ -379,7 +379,6 @@ public class GraphPanel extends JPanel {
 		 * @param g
 		 */
 		public void draw(final Graphics2D g) {
-			// TODO
 			// Draw the points
 			g.setColor(color);
 			g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),

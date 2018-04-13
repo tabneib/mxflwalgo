@@ -1,35 +1,20 @@
 package de.tud.ega.model;
 
-/**
- * Class representing a vertex
- * 
- */
-public class Arc implements Comparable<Arc>{
+public abstract class Arc implements Comparable<Arc>{
 
-	public int getCapacity() {
-		return capacity;
-	}
-
-	public int getFlow() {
-		return flow;
-	}
-
-	private Vertex startVertex, endVertex;
-	public final int capacity;
-	private int flow;
+	private MVertex startVertex, endVertex;
 	public int length;
 	Direction direction = null;
 
 	/**
-	 * Construct an edge by two points and its capacity
+	 * Construct an arc by two points
 	 * 
 	 * @param startVertex
 	 * @param endVertex
 	 */
-	public Arc(Vertex startVertex, Vertex endVertex, int capacity) {
+	public Arc(MVertex startVertex, MVertex endVertex) {
 		this.startVertex = startVertex;
 		this.endVertex = endVertex;
-		this.capacity = capacity;
 		this.length = (int) Math.sqrt(Math.pow(endVertex.x - startVertex.x, 2)
 				+ Math.pow(endVertex.y - startVertex.y, 2));
 	}
@@ -83,17 +68,17 @@ public class Arc implements Comparable<Arc>{
 		return startVertex.hashCode() + endVertex.hashCode();
 	}
 
-	public Vertex getStartVertex() {
+	public MVertex getStartVertex() {
 		return startVertex;
 	}
 
-	public Vertex getEndVertex() {
+	public MVertex getEndVertex() {
 		return endVertex;
 	}
 
 	@Override
 	public String toString() {
-		return "Edge(" + startVertex.toString() + " - " + endVertex.toString() + ")";
+		return "Arc(" + startVertex.toString() + " - " + endVertex.toString() + ")";
 	}
 
 	@Override
@@ -102,7 +87,7 @@ public class Arc implements Comparable<Arc>{
 		if (o == null)
 			throw new NullPointerException();
 		if (!(o instanceof Arc))
-			throw new RuntimeException("Input must be of type Edge!");
+			throw new RuntimeException("Input must be of type Arc!");
 		
 		Arc other = (Arc) o;
 		if (other.length > this.length)
