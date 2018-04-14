@@ -6,6 +6,7 @@ import de.tud.ega.model.MaxFlowProblem;
 public abstract class MaxFlowAlgo {
 
 	protected final MaxFlowProblem problem;
+	protected boolean finished = false;
 	
 	public MaxFlowAlgo(MaxFlowProblem maxFlowProblem) {
 		this.problem = maxFlowProblem;
@@ -24,4 +25,13 @@ public abstract class MaxFlowAlgo {
 	 * 			A graph that represents the intermediate result
 	 */
 	public abstract MGraph runStep();
+	
+	/**
+	 * Check if the algorithm has already finished
+	 * @return
+	 * 			True if finished, False otherwise
+	 */
+	public boolean isFinished() {
+		return finished;
+	};
 }

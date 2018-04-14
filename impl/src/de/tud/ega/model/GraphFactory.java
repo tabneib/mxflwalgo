@@ -127,6 +127,8 @@ public class GraphFactory {
 					arc.getStartVertex(), random.nextInt(maxCapacity));
 			reversedArcs.add(a);
 			arc.getEndVertex().addIncidentArc(a);
+			arc.setTwinArc(a);
+			a.setTwinArc(arc);
 		}
 		arcs.addAll(reversedArcs);
 		

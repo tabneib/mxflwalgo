@@ -54,5 +54,4 @@ public class ResArc extends Arc {
 	public boolean isForward() {
 		return this.isForward;
 	}
-	
 }

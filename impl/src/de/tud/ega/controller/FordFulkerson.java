@@ -29,14 +29,26 @@ public class FordFulkerson extends MaxFlowAlgo {
 			updateResGraph(augPath);
 			updateGraph(augPath);
 		}
+		this.problem.getGraph().clearAllHighlight();
+		this.finished = true;
 		return this.problem.getGraph();
 	}
 
 	@Override
 	public MGraph runStep() {
 		AugmentingPath augPath = dfs();
-		if (augPath == null)
-			return null;
+		if (augPath == null){
+			this.problem.getGraph().clearAllHighlight();
+			this.finished = true;
+			return this.problem.getGraph();
+		}
+		// Highlighting stuffs
+		this.problem.getGraph().clearAllHighlight();
+		for (ResArc rArc : augPath.arcs) {
+			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
+			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
+			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());
+		}
 		updateResGraph(augPath);
 		updateGraph(augPath);
 		return this.problem.getGraph();

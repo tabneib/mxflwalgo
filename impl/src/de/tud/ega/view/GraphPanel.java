@@ -1,9 +1,13 @@
 package de.tud.ega.view;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -11,12 +15,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import de.tud.ega.model.Arc;
 import de.tud.ega.model.MArc;
 import de.tud.ega.model.MGraph;
 import de.tud.ega.model.MVertex;
+import de.tud.ega.model.MaxFlowProblem;
 
 /**
  * JPanel for displaying and updating a beautiful graph
@@ -43,7 +49,7 @@ public class GraphPanel extends JPanel {
 	/**
 	 * Relative position of the arrow head on the corresponding line
 	 */
-	private static final double ARROW_HEAD_POSITION = 0.3;
+	private static final double ARROW_HEAD_POSITION = 0.33;
 
 	/**
 	 * The size of the edges of a node
@@ -85,9 +91,18 @@ public class GraphPanel extends JPanel {
 	private double scale = 1.;
 
 	private boolean scaleUpdated;
+	private boolean labelInserted;
 
-	private static final Color NODE_COLOR = Color.RED;
-	private static final Color LINE_COLOR = Color.BLACK;
+	private static final Color NODE_HIGHLIGHTED_COLOR = Color.RED;
+	private static final Color NODE_UNDEREMPHASIZED_COLOR = Color.GRAY;
+	
+	private static final Color LINE_NORMAL_COLOR = Color.BLACK;
+	private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
+	private static final Color LINE_UNDEREMPHASIZED_COLOR = Color.GRAY;
+	
+	private static final Color TRANSPARENT_COLOR = new Color(0,0,0,1);
+	
+	private final MaxFlowProblem maxFlowProblem;
 
 	/**
 	 * Creates a new JGraphPanel with a given list of arcs and updates the scale
@@ -96,17 +111,19 @@ public class GraphPanel extends JPanel {
 	 * @param arcs
 	 *            list of arcs
 	 */
-	public GraphPanel(MGraph graph) {
-		this.arcs = graph.getArcs();
-		this.vertices = graph.getVertices();
+	public GraphPanel(MaxFlowProblem problem) {
+		this.maxFlowProblem = problem;
+		this.arcs = this.maxFlowProblem.getGraph().getArcs();
+		this.vertices = this.maxFlowProblem.getGraph().getVertices();
 		this.scaleUpdated = false;
+		this.labelInserted = false;
 
 		// Create mapping from arcs to lines
 		this.lines = new ArrayList<>();
 		this.arcToLine = new HashMap<>();
 		for (Arc arc : this.arcs) {
 			Line l = new Line(arc, arc.getStartVertex().x, arc.getStartVertex().y,
-					arc.getEndVertex().x, arc.getEndVertex().y, LINE_COLOR);
+					arc.getEndVertex().x, arc.getEndVertex().y);
 			this.lines.add(l);
 			arcToLine.put(arc, l);
 		}
@@ -115,7 +132,7 @@ public class GraphPanel extends JPanel {
 		this.nodes = new ArrayList<>();
 		this.vertexToNode = new HashMap<>();
 		for (MVertex vertex : this.vertices) {
-			Node n = new Node(vertex.x, vertex.y, NODE_COLOR);
+			Node n = new Node(vertex, vertex.x, vertex.y);
 			this.nodes.add(n);
 			this.vertexToNode.put(vertex, n);
 		}
@@ -141,6 +158,9 @@ public class GraphPanel extends JPanel {
 
 		for (MVertex vertex : this.vertices)
 			this.drawVertex(g2d, vertex);
+		
+		if (!labelInserted)
+			this.insertLabels();
 	}
 
 	/**
@@ -152,7 +172,7 @@ public class GraphPanel extends JPanel {
 	private void drawArc(final Graphics2D g, Arc arc) {
 		if (!this.arcs.contains(arc))
 			throw new RuntimeException("Cannot draw an unknown arc: " + arc);
-		this.arcToLine.get(arc).draw(g, this);
+		this.arcToLine.get(arc).draw(g);
 	}
 
 	/**
@@ -169,7 +189,8 @@ public class GraphPanel extends JPanel {
 
 	/**
 	 * Draw an arrow head with the given coordinates of the corresponding line
-	 * and color
+	 * and color. If the given graphics and color are null, so do not draw anything but 
+	 * just calculate the position of the arrow head.
 	 * 
 	 * @param g1
 	 * @param x1
@@ -186,8 +207,6 @@ public class GraphPanel extends JPanel {
 	 */
 	private Point drawdArrowHead(final Graphics g1, Color color, int x1, int y1, int x2,
 			int y2) {
-		Graphics2D g = (Graphics2D) g1.create();
-		g.setColor(color);
 
 		double dx = x2 - x1, dy = y2 - y1;
 		double len = Math.sqrt(dx * dx + dy * dy);
@@ -205,13 +224,18 @@ public class GraphPanel extends JPanel {
 		double angle = Math.atan2(dy, dx);
 		AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
 		at.concatenate(AffineTransform.getRotateInstance(angle));
-		g.transform(at);
-
-		g.fillPolygon(
-				new int[] { (int) len, (int) len - ARROW_HEAD_SIZE,
-						(int) len - ARROW_HEAD_SIZE, (int) len },
-				new int[] { 0, -ARROW_HEAD_SIZE / 2, ARROW_HEAD_SIZE / 2, 0 }, 4);
 		
+		if (g1 != null && color != null) {
+			Graphics2D g = (Graphics2D) g1.create();
+			g.setColor(color);
+			g.transform(at);
+
+			g.fillPolygon(
+					new int[] { (int) len, (int) len - ARROW_HEAD_SIZE,
+							(int) len - ARROW_HEAD_SIZE, (int) len },
+					new int[] { 0, -ARROW_HEAD_SIZE / 2, ARROW_HEAD_SIZE / 2, 0 }, 4);
+		}
+			
 		return new Point(x2, y2);
 	}
 
@@ -245,6 +269,17 @@ public class GraphPanel extends JPanel {
 	}
 
 	/**
+	 * Insert labels for the arcs of the graph.
+	 * We don't do this in paintComponent to prevent infinite loop due to repainting.
+	 */
+	public void insertLabels() {
+		if (!labelInserted) 
+			for (Line line : this.lines)
+				add(line.getLabel());
+		labelInserted = true;
+	}
+	
+	/**
 	 * Internal class representing a line in the to be drawn graph
 	 *
 	 */
@@ -253,44 +288,35 @@ public class GraphPanel extends JPanel {
 		final int y1;
 		final int x2;
 		final int y2;
-		Color color;
 		final Arc arc;
 		JLabel label;
 
-		public Line(Arc arc, int x1, int y1, int x2, int y2, Color color) {
+		public Line(Arc arc, int x1, int y1, int x2, int y2) {
 			this.arc = arc;
 			this.x1 = x1;
 			this.y1 = y1;
 			this.x2 = x2;
 			this.y2 = y2;
-			this.color = color;
+		}
+		
+		/**
+		 * Generate the label of this arc
+		 */
+		private void generateLabel() {
+
 			if (this.arc instanceof MArc)
 				this.label = new JLabel(
 						((MArc) arc).getFlow() + "|" + ((MArc) arc).getCapacity());
 			// else: TODO
-		}
-
-		/**
-		 * Draw this line, an arrow head and the corresponding label onto the
-		 * given graphic
-		 * 
-		 * @param g
-		 */
-		public void draw(final Graphics2D g, JPanel graphPanel) {
-
-			// Draw the line
-			g.setColor(color);
-			g.drawLine((int) (x1 * scale + OFF_X), (int) (y1 * scale + OFF_Y),
-					(int) (x2 * scale + OFF_X), (int) (y2 * scale + OFF_Y));
-
-			// Draw the arrow head
-			Point arrowHeadPos = drawdArrowHead(g, color, (int) (x1 * scale + OFF_X),
+			
+			// Get the position of the arrow head
+			Point arrowHeadPos = drawdArrowHead(null, null, (int) (x1 * scale + OFF_X),
 					(int) (y1 * scale + OFF_Y), (int) (x2 * scale + OFF_X),
 					(int) (y2 * scale + OFF_Y));
 
 			// No label if small scale
 			if (scale <= SMALL_SCALE)
-				return;
+				this.label = null;
 			
 			// Scale is OK, add the label
 			label.setSize(LABEL_WIDTH, LABEL_HEIGHT);
@@ -353,8 +379,48 @@ public class GraphPanel extends JPanel {
 			default:
 				throw new RuntimeException("Unkown arc direction!");
 			}
+		}
 
-			graphPanel.add(label);
+		/**
+		 * Draw this line, an arrow head and the corresponding label onto the
+		 * given graphic
+		 * 
+		 * @param g
+		 */
+		public void draw(final Graphics2D g) {
+
+			g.setStroke(new BasicStroke(1));
+			// Draw the line
+			if (maxFlowProblem.getGraph().highlightMode()) {
+				if (!(maxFlowProblem.getGraph().isHighlighted(this.arc))) {
+					if ((maxFlowProblem.getGraph().isHighlighted(this.arc.getTwinArc())))
+						g.setColor(TRANSPARENT_COLOR);
+					else
+						g.setColor(LINE_UNDEREMPHASIZED_COLOR);
+				}
+				else{
+					g.setStroke(new BasicStroke(3));
+					g.setColor(LINE_HIGHLIGHTED_COLOR);
+				}
+			}
+			else
+				g.setColor(LINE_NORMAL_COLOR);
+
+			g.drawLine((int) (x1 * scale + OFF_X), (int) (y1 * scale + OFF_Y),
+					(int) (x2 * scale + OFF_X), (int) (y2 * scale + OFF_Y));
+
+			// Draw the arrow head
+			drawdArrowHead(g, g.getColor(), (int) (x1 * scale + OFF_X),
+					(int) (y1 * scale + OFF_Y), (int) (x2 * scale + OFF_X),
+					(int) (y2 * scale + OFF_Y));
+
+		}
+		
+		public JLabel getLabel() {
+			if (this.label == null)
+				// Create the label
+				generateLabel();
+			return this.label;
 		}
 	}
 
@@ -363,14 +429,14 @@ public class GraphPanel extends JPanel {
 	 *
 	 */
 	private class Node {
+		final MVertex vertex;
 		final int x;
 		final int y;
-		Color color;
 
-		public Node(int x, int y, Color color) {
+		public Node(MVertex vertex, int x, int y) {
+			this.vertex = vertex;
 			this.x = x;
 			this.y = y;
-			this.color = color;
 		}
 
 		/**
@@ -379,10 +445,24 @@ public class GraphPanel extends JPanel {
 		 * @param g
 		 */
 		public void draw(final Graphics2D g) {
+
 			// Draw the points
-			g.setColor(color);
-			g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),
-					(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE, NODE_SIZE);
+			if (this.vertex.equals(maxFlowProblem.getSource()) ||
+					this.vertex.equals(maxFlowProblem.getTarget())) {
+				g.setColor(NODE_HIGHLIGHTED_COLOR);
+				g.fillOval((int) (x * scale - NODE_SIZE + OFF_X),
+						(int) (y * scale - NODE_SIZE + OFF_Y), 2*NODE_SIZE, 2*NODE_SIZE);
+			}
+			else  {
+				if (maxFlowProblem.getGraph().highlightMode() &&
+						!(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
+					g.setColor(NODE_UNDEREMPHASIZED_COLOR);
+				else
+					g.setColor(NODE_HIGHLIGHTED_COLOR);
+				
+				g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),
+						(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE, NODE_SIZE);
+			}
 		}
 	}
 }

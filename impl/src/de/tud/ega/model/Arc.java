@@ -9,6 +9,11 @@ public abstract class Arc implements Comparable<Arc>{
 	 */
 	public final String id;
 	
+	/**
+	 * The arc that has the same start- and endpoint but different direction
+	 */
+	private Arc twinArc;
+	
 	protected MVertex startVertex;
 	protected MVertex endVertex;
 	public int length;
@@ -108,6 +113,14 @@ public abstract class Arc implements Comparable<Arc>{
 			
 	}
 	
+	public Arc getTwinArc() {
+		return twinArc;
+	}
+
+	public void setTwinArc(Arc twinArc) {
+		this.twinArc = twinArc;
+	}
+
 	/**
 	 * Possible directions of the arcs
 	 */

@@ -63,15 +63,16 @@ public class GUI extends JFrame {
 	// Data
 	MGraph mGraph;
 	//private static final int DEFAULT_VERTEX_NUMBER = 39;
-	private static final int DEFAULT_VERTEX_NUMBER = 6;
-	private static final int DEFAULT_MAX_CAPACITY = 10;
+	private static final int DEFAULT_VERTEX_NUMBER = 53;
+	private static final int DEFAULT_MAX_CAPACITY = 100;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
 
 	@Deprecated
 	private String algoName;
 	private MaxFlowAlgo algorith;
-	
+	private MaxFlowProblem problem;
+
 	public static void main(String[] args) {
 		new GUI();
 	}
@@ -121,7 +122,7 @@ public class GUI extends JFrame {
 		// The container of all the boxes
 		c.weightx = 1.0;
 		c.gridx = 0;
-		pane.add(makeGraphContainer(null), c);
+		pane.add(makeGraphContainer(), c);
 
 		// The container of the menu
 		c.weightx = 0.5;
@@ -142,19 +143,19 @@ public class GUI extends JFrame {
 	 * 
 	 * @return
 	 */
-	private Container makeGraphContainer(MGraph graph) {
+	private Container makeGraphContainer() {
 
 		GraphPanel graphPanel;
 		//mGraph = getSampleGraph();
-		if (graph == null) {
+		if (this.mGraph == null) {
 			try {
-				mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
+				this.mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
 						JOptionPane.INFORMATION_MESSAGE);
 				e.printStackTrace();
 			}
-			graphPanel = new GraphPanel(mGraph);
+			this.problem = new MaxFlowProblem(this.mGraph);
 
 			if (this.algorith != null){
 				buttonGroupAlgo.clearSelection();
@@ -163,10 +164,8 @@ public class GUI extends JFrame {
 				this.algorith = null;
 			}
 		}
-		else {
-			graphPanel = new GraphPanel(graph);
-		}
-			
+		graphPanel = new GraphPanel(this.problem);
+
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);
 		scrollPane.setPreferredSize(new Dimension(
@@ -330,6 +329,7 @@ public class GUI extends JFrame {
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
 						
+						mGraph = null;
 						textFieldParams.setText(vertexNumber + " " + maxCapacity);
 						
 						Component gContainer = frame.getContentPane().getComponent(0);
@@ -338,7 +338,7 @@ public class GUI extends JFrame {
 						GridBagConstraints c = l.getConstraints(gContainer);
 
 						frame.getContentPane().remove(gContainer);
-						frame.getContentPane().add(makeGraphContainer(null), c, 0);
+						frame.getContentPane().add(makeGraphContainer(), c, 0);
 						frame.getContentPane().validate();
 					}
 				});
@@ -360,17 +360,15 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
-						
-						MGraph intermediateRes = algorith.runStep();
-						
-						if (intermediateRes != null) {
+						if (!algorith.isFinished()) {
+							algorith.runStep();
 							Component gContainer = frame.getContentPane().getComponent(0);
 							GridBagLayout l = (GridBagLayout) frame.getContentPane()
 									.getLayout();
 							GridBagConstraints c = l.getConstraints(gContainer);
 	
 							frame.getContentPane().remove(gContainer);
-							frame.getContentPane().add(makeGraphContainer(intermediateRes), c, 0);
+							frame.getContentPane().add(makeGraphContainer(), c, 0);
 							frame.getContentPane().validate();
 						}
 						// TODO: Else => finished => notification!
@@ -388,14 +386,14 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
-
+						algorith.run();
 						Component gContainer = frame.getContentPane().getComponent(0);
 						GridBagLayout l = (GridBagLayout) frame.getContentPane()
 								.getLayout();
 						GridBagConstraints c = l.getConstraints(gContainer);
 
 						frame.getContentPane().remove(gContainer);
-						frame.getContentPane().add(makeGraphContainer(algorith.run()), c, 0);
+						frame.getContentPane().add(makeGraphContainer(), c, 0);
 						frame.getContentPane().validate();
 					}
 				});
@@ -413,7 +411,7 @@ public class GUI extends JFrame {
 				algoName = FORD_FULKERSON;
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
-				algorith = new FordFulkerson(new MaxFlowProblem(mGraph));
+				algorith = new FordFulkerson(problem);
 			}
 			else if (radioEdmondsKarp.isSelected()) {
 				algoName = EDMONDS_KARP;
