@@ -80,12 +80,14 @@ public class GraphFactory {
 		// Create all vertical and diagonal arcs
 		for (int i = 0; i < vertices.size() - 1; i++) {
 			for (int j = 0; j < vertices.get(i).size(); j++) {
-				// vertical arc
+				
+				// Vertical arc
 				MArc a = new MArc(vertices.get(i).get(j), vertices.get(i + 1).get(j),
 						random.nextInt(maxCapacity));
 				arcs.add(a);
 				vertices.get(i).get(j).addIncidentArc(a);
-				// diagonal arc
+				
+				// Diagonal arc
 				if (j < vertices.get(i).size() - 1) {
 					// Not yet the last vertex on this row
 					if (random.nextBoolean()) {

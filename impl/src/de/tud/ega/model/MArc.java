@@ -23,15 +23,6 @@ public class MArc extends Arc {
 		this.capacity = capacity;
 	}
 	
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || !(o instanceof MArc))
-			return false;
-		MArc other = (MArc) o;
-		return (super.equals(other) && this.getCapacity() == other.getCapacity());
-	}
-
 	public int getCapacity() {
 		return capacity;
 	}

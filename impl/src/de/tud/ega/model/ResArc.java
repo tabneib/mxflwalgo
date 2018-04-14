@@ -55,8 +55,4 @@ public class ResArc extends Arc {
 		return this.isForward;
 	}
 	
-	public boolean equals(Object o) {
-		ResArc other = (ResArc) o;
-		return super.equals(o) && other.getOriginalArc().equals(this.originalArc);
-	}
 }

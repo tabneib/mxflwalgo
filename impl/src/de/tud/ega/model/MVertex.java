@@ -24,7 +24,7 @@ public class MVertex extends Point {
 	/**
 	 * The ID of the graph search in which this vertex is already seen
 	 */
-	private long searchId;
+	private String searchId = "";
 	
 	/**
 	 * Construct a point by its coordinates
@@ -36,7 +36,6 @@ public class MVertex extends Point {
 		super(x,y);
 		this.incidentArcs = new ArrayList<>();
 		this.resIncidentArcs = new ArrayList<>();
-		this.searchId = -1;
 	}
 	
 
@@ -121,7 +120,7 @@ public class MVertex extends Point {
 	 * Set this vertex as seen in the graph search with the given Id
 	 * @param searchId
 	 */
-	public void setSeen(long searchId) {
+	public void setSeen(String searchId) {
 		this.searchId = searchId;
 	}
 	
@@ -130,8 +129,8 @@ public class MVertex extends Point {
 	 * @param searchId
 	 * @return
 	 */
-	public boolean isSeen(long searchId) {
-		return this.searchId == searchId;
+	public boolean isSeen(String searchId) {
+		return this.searchId.equals(searchId);
 	}
 	@Override
 	public String toString() {

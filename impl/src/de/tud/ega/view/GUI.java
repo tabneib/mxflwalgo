@@ -351,6 +351,35 @@ public class GUI extends JFrame {
 		radioDinic.addActionListener(new AlgorithmSelectListener());
 		radioGoldbergTarjan.addActionListener(new AlgorithmSelectListener());
 		
+		// Run 1 step 
+		buttonRunStep.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						MGraph intermediateRes = algorith.runStep();
+						
+						if (intermediateRes != null) {
+							Component gContainer = frame.getContentPane().getComponent(0);
+							GridBagLayout l = (GridBagLayout) frame.getContentPane()
+									.getLayout();
+							GridBagConstraints c = l.getConstraints(gContainer);
+	
+							frame.getContentPane().remove(gContainer);
+							frame.getContentPane().add(makeGraphContainer(intermediateRes), c, 0);
+							frame.getContentPane().validate();
+						}
+						// TODO: Else => finished => notification!
+					}
+				});
+			}
+		});
+		
+		// Run the whole algorithm
 		buttonRun.addActionListener(new ActionListener() {
 			
 			@Override
@@ -383,6 +412,7 @@ public class GUI extends JFrame {
 			if (radioFordFulkerson.isSelected()) {
 				algoName = FORD_FULKERSON;
 				buttonRun.setEnabled(true);
+				buttonRunStep.setEnabled(true);
 				algorith = new FordFulkerson(new MaxFlowProblem(mGraph));
 			}
 			else if (radioEdmondsKarp.isSelected()) {

@@ -1,7 +1,14 @@
 package de.tud.ega.model;
 
+import java.util.UUID;
+
 public abstract class Arc implements Comparable<Arc>{
 
+	/**
+	 * Each arc has an unique ID to overcome the fact that the set of arc is a multiset
+	 */
+	public final String id;
+	
 	protected MVertex startVertex;
 	protected MVertex endVertex;
 	public int length;
@@ -18,6 +25,7 @@ public abstract class Arc implements Comparable<Arc>{
 		this.endVertex = endVertex;
 		this.length = (int) Math.sqrt(Math.pow(endVertex.x - startVertex.x, 2)
 				+ Math.pow(endVertex.y - startVertex.y, 2));
+		this.id = UUID.randomUUID().toString();
 	}
 	
 	/**
@@ -60,8 +68,7 @@ public abstract class Arc implements Comparable<Arc>{
 		Arc other = (Arc) o;
 
 		// Check whether two edges have the same start vertex and end vertex.
-		return (other.getStartVertex().equals(this.getStartVertex())
-				&& other.getEndVertex().equals(this.getEndVertex()));
+		return this.id.equals(other.id);
 	}
 
 	@Override
