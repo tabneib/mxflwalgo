@@ -22,6 +22,12 @@ public class MVertex extends Point {
 	private ArrayList<ResArc> resIncidentArcs;
 	
 	/**
+	 * This is the arc to the parent vertex of this vertex in some arborescence. 
+	 * This field is optional and can be used by a algorithm.
+	 */
+	private Arc parent = null;
+	
+	/**
 	 * The ID of the graph search in which this vertex is already seen
 	 */
 	private String searchId = "";
@@ -135,5 +141,15 @@ public class MVertex extends Point {
 	@Override
 	public String toString() {
 		return "(" + Integer.toString(x) + ", " + Integer.toString(y) + ")";
+	}
+
+
+	public Arc getParent() {
+		return parent;
+	}
+
+
+	public void setParent(Arc parent) {
+		this.parent = parent;
 	}
 }

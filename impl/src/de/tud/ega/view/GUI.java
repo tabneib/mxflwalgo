@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 
 import de.tud.ega.model.MGraph;
 import de.tud.ega.model.MaxFlowProblem;
+import de.tud.ega.controller.EdmondsKarp;
 import de.tud.ega.controller.FordFulkerson;
 import de.tud.ega.controller.MaxFlowAlgo;
 import de.tud.ega.model.GraphFactory;
@@ -289,7 +290,7 @@ public class GUI extends JFrame {
 		buttonRun.setEnabled(false);
 		
 		// TODO: remove this when all features are implemented
-		radioEdmondsKarp.setEnabled(false);
+		//radioEdmondsKarp.setEnabled(false);
 		radioDinic.setEnabled(false);
 		radioGoldbergTarjan.setEnabled(false);
 
@@ -415,7 +416,9 @@ public class GUI extends JFrame {
 			}
 			else if (radioEdmondsKarp.isSelected()) {
 				algoName = EDMONDS_KARP;
-				// TODO
+				buttonRun.setEnabled(true);
+				buttonRunStep.setEnabled(true);
+				algorith = new EdmondsKarp(problem);
 			}
 			else if (radioDinic.isSelected()) {
 				algoName = DINIC;

@@ -3,8 +3,6 @@ package de.tud.ega.controller;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import de.tud.ega.model.Arc;
-import de.tud.ega.model.MArc;
 import de.tud.ega.model.MGraph;
 import de.tud.ega.model.MVertex;
 import de.tud.ega.model.MaxFlowProblem;
@@ -12,12 +10,8 @@ import de.tud.ega.model.ResArc;
 
 public class FordFulkerson extends MaxFlowAlgo {
 
-	private MGraph resGraph;
-	private String dfsSearchId;
-
 	public FordFulkerson(MaxFlowProblem maxFlowProblem) {
 		super(maxFlowProblem);
-		createResGraph();
 	}
 
 	@Override
@@ -55,78 +49,15 @@ public class FordFulkerson extends MaxFlowAlgo {
 	}
 
 	/**
-	 * Recompute the residual graph.
-	 */
-	private void createResGraph() {
-		ArrayList<Arc> arcs = new ArrayList<>();
-		for (Arc arc : this.problem.getGraph().getArcs()) {
-			MArc mArc = (MArc) arc;
-
-			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(),
-					mArc.getCapacity() - mArc.getFlow(), null, arc, true);
-
-			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(),
-					mArc.getFlow(), forward, arc, false);
-
-			forward.setBackwardResArc(backward);
-			arcs.add(forward);
-			arcs.add(backward);
-			mArc.getStartVertex().addResIncidentArc(forward);
-			mArc.getEndVertex().addResIncidentArc(backward);
-		}
-		this.resGraph = new MGraph(this.problem.getGraph().getVertices(), arcs);
-		System.out.println("[Ford-Fulkerson] Residual Graph created. (V,A) = ("
-				+ this.resGraph.getVertices().size() + ", "
-				+ this.resGraph.getArcs().size() + ")");
-	}
-
-	/**
-	 * Update the residual graph along a graph augmenting path
-	 * 
-	 * @param augPath
-	 *            The given graph augmenting path
-	 */
-	private void updateResGraph(AugmentingPath augPath) {
-		System.out.println("AugPath = " + augPath);
-		for (ResArc arc : augPath.arcs) {
-			if (arc.getResValue() >= augPath.value) {
-				arc.setResValue(arc.getResValue() - augPath.value);
-				// Update the backward arc
-				arc.getBackwardResArc().setResValue(
-						arc.getBackwardResArc().getResValue() + augPath.value);
-			} else
-				throw new RuntimeException("Invalid augmenting value: " + augPath.value);
-		}
-	}
-
-	/**
-	 * Update the graph along a graph augmenting path
-	 * 
-	 * @param augPath
-	 *            The given graph augmenting path
-	 */
-	private void updateGraph(AugmentingPath augPath) {
-		for (ResArc arc : augPath.arcs) {
-			if (arc.isForward())
-				((MArc) arc.getOriginalArc())
-						.setFlow(((MArc) arc.getOriginalArc()).getFlow() + augPath.value);
-			else
-				((MArc) arc.getOriginalArc())
-						.setFlow(((MArc) arc.getOriginalArc()).getFlow() - augPath.value);
-		}
-	}
-
-	/**
 	 * Depth First Search
 	 * 
 	 * @return
 	 */
 	private AugmentingPath dfs() {
-		this.dfsSearchId = UUID.randomUUID().toString();
-		this.problem.getSource().setSeen(dfsSearchId);
+		String searchId = UUID.randomUUID().toString();
+		this.problem.getSource().setSeen(searchId);
 		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(),
-				Integer.MAX_VALUE, dfsSearchId);
-
+				Integer.MAX_VALUE, searchId);
 	}
 
 	/**
@@ -166,36 +97,4 @@ public class FordFulkerson extends MaxFlowAlgo {
 		// Unable to go any further
 		return null;
 	}
-
-	public MGraph getResGraph() {
-		return this.resGraph;
-	}
-
-	/**
-	 * Inner class that represents a graph augmenting path which is a tuple of
-	 * generic type for its elements
-	 *
-	 */
-	public class AugmentingPath {
-
-		/**
-		 * The arcs on the residual graph that belong to this path
-		 */
-		public final ArrayList<ResArc> arcs;
-		public final int value;
-
-		public AugmentingPath(ArrayList<ResArc> arcs, int value) {
-			this.arcs = arcs;
-			this.value = value;
-		}
-
-		public String toString() {
-			String str = value + " - ";
-			for (ResArc arc : this.arcs)
-				str += arc.getDirection() + " - ";
-			str = str.substring(0, str.length() - 3);
-			return str;
-		}
-	}
-
 }

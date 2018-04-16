@@ -264,7 +264,7 @@ public class GraphPanel extends JPanel {
 		double scaleY = (this.getHeight() - OFF_Y - 10) / maxY;
 
 		this.scale = Math.min(scaleX, scaleY);
-		System.out.println("[GraphPanel] scale = " + this.scale);
+		//System.out.println("[GraphPanel] scale = " + this.scale);
 		scaleUpdated = true;
 	}
 
