@@ -159,7 +159,7 @@ public class GraphPanel extends JPanel {
 		for (MVertex vertex : this.vertices)
 			this.drawVertex(g2d, vertex);
 		
-		if (!labelInserted)
+		if (this.scale > SMALL_SCALE && !labelInserted)
 			this.insertLabels();
 	}
 
