@@ -93,7 +93,7 @@ public class GUI extends JFrame {
 	 * create GUI window and call method to add stuff onto it
 	 */
 	public void initGUI() {
-		frame = new JFrame("EGA GUI");
+		frame = new JFrame("mxflwalgo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(
 				GRAPH_CONTAINER_WIDTH + SCROLL_VIEW_PADDING + MENU_CONTAINER_WIDTH,
