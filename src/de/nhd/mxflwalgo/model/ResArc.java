@@ -16,7 +16,7 @@ public class ResArc extends Arc {
 	 * The corresponding arc on the original graph
 	 */
 	private Arc originalArc;
-	
+
 	/**
 	 * If this residual arc is forward or backward regarding the original arc
 	 */
@@ -29,6 +29,27 @@ public class ResArc extends Arc {
 		this.backwardResArc = backwardArc;
 		this.originalArc = originalArc;
 		this.isForward = isForward;
+	}
+
+	/**
+	 * Add the given flow value onto this residual arc. The flow value of the
+	 * original arc and the residual value of the corresponding residual arc are
+	 * updated accordingly.
+	 * 
+	 * @param flowValue
+	 *            the flow value to add
+	 */
+	public void addFlow(int flowValue) {
+		if (this.resValue >= flowValue) {
+			this.resValue -= flowValue;
+			this.backwardResArc
+					.setResValue(this.backwardResArc.getResValue() + flowValue);
+			((MArc) this.originalArc).setFlow(this.isForward
+					? ((MArc) this.originalArc).getFlow() + flowValue
+					: ((MArc) this.originalArc).getFlow() - flowValue);
+		} else
+			throw new RuntimeException(
+					"Flow value to add too large: " + flowValue + " > " + this.resValue);
 	}
 
 	public int getResValue() {

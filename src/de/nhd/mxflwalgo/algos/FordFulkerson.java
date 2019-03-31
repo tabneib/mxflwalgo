@@ -20,8 +20,7 @@ public class FordFulkerson extends MaxFlowAlgo {
 			AugmentingPath augPath = dfs();
 			if (augPath == null)
 				break;
-			updateResGraph(augPath);
-			updateGraph(augPath);
+			updateGraphs(augPath);
 		}
 		this.problem.getGraph().clearAllHighlight();
 		this.finished = true;
@@ -37,8 +36,7 @@ public class FordFulkerson extends MaxFlowAlgo {
 			return this.problem.getGraph();
 		}
 		highlightAugPath(augPath, true);
-		updateResGraph(augPath);
-		updateGraph(augPath);
+		updateGraphs(augPath);
 		return this.problem.getGraph();
 	}
 

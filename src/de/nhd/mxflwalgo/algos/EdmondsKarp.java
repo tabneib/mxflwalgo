@@ -21,8 +21,7 @@ public class EdmondsKarp extends MaxFlowAlgo {
 			AugmentingPath augPath = bfs();
 			if (augPath == null)
 				break;
-			updateResGraph(augPath);
-			updateGraph(augPath);
+			updateGraphs(augPath);
 		}
 		this.problem.getGraph().clearAllHighlight();
 		this.finished = true;
@@ -38,8 +37,7 @@ public class EdmondsKarp extends MaxFlowAlgo {
 			return this.problem.getGraph();
 		}
 		highlightAugPath(augPath, true);
-		updateResGraph(augPath);
-		updateGraph(augPath);
+		updateGraphs(augPath);
 		return this.problem.getGraph();
 	}
 

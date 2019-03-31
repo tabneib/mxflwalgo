@@ -68,35 +68,14 @@ public abstract class MaxFlowAlgo {
 	}
 
 	/**
-	 * Update the residual graph along a flow augmenting path
+	 * Update the graph and its residual graph along a flow augmenting path
 	 * 
 	 * @param augPath
 	 *            The given flow augmenting path
 	 */
-	protected void updateResGraph(AugmentingPath augPath) {
-		for (ResArc arc : augPath.arcs) {
-			if (arc.getResValue() >= augPath.value) {
-				arc.setResValue(arc.getResValue() - augPath.value);
-				// Update the backward arc
-				arc.getBackwardResArc().setResValue(arc.getBackwardResArc().getResValue() + augPath.value);
-			} else
-				throw new RuntimeException("Augmenting value too large: " + augPath.value);
-		}
-	}
-
-	/**
-	 * Update the graph along a flow augmenting path
-	 * 
-	 * @param augPath
-	 *            The given flow augmenting path
-	 */
-	protected void updateGraph(AugmentingPath augPath) {
-		for (ResArc arc : augPath.arcs) {
-			if (arc.isForward())
-				((MArc) arc.getOriginalArc()).setFlow(((MArc) arc.getOriginalArc()).getFlow() + augPath.value);
-			else
-				((MArc) arc.getOriginalArc()).setFlow(((MArc) arc.getOriginalArc()).getFlow() - augPath.value);
-		}
+	protected void updateGraphs(AugmentingPath augPath) {
+		for (ResArc arc : augPath.arcs)
+			arc.addFlow(augPath.value);
 	}
 
 	public MGraph getResGraph() {

@@ -24,8 +24,7 @@ public class Dinic extends MaxFlowAlgo {
 
 			AugmentingPath augPath = this.dfs(bfsSearchId);
 			while (augPath != null) {
-				updateResGraph(augPath);
-				updateGraph(augPath);
+				updateGraphs(augPath);
 				augPath = this.dfs(bfsSearchId);
 			}
 		}
@@ -49,8 +48,7 @@ public class Dinic extends MaxFlowAlgo {
 		AugmentingPath augPath = this.dfs(bfsSearchId);
 		while (augPath != null) {
 			highlightAugPath(augPath, false);
-			updateResGraph(augPath);
-			updateGraph(augPath);
+			updateGraphs(augPath);
 			augPath = this.dfs(bfsSearchId);
 		}
 		return this.problem.getGraph();
