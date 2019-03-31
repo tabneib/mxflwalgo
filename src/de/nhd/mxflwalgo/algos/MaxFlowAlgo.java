@@ -2,12 +2,11 @@ package de.nhd.mxflwalgo.algos;
 
 import java.util.ArrayList;
 
-import de.nhd.mxflwalgo.algos.MaxFlowAlgo.AugmentingPath;
-import de.nhd.mxflwalgo.algos.model.Arc;
-import de.nhd.mxflwalgo.algos.model.MArc;
-import de.nhd.mxflwalgo.algos.model.MGraph;
-import de.nhd.mxflwalgo.algos.model.MaxFlowProblem;
-import de.nhd.mxflwalgo.algos.model.ResArc;
+import de.nhd.mxflwalgo.model.Arc;
+import de.nhd.mxflwalgo.model.MArc;
+import de.nhd.mxflwalgo.model.MGraph;
+import de.nhd.mxflwalgo.model.MaxFlowProblem;
+import de.nhd.mxflwalgo.model.ResArc;
 
 public abstract class MaxFlowAlgo {
 

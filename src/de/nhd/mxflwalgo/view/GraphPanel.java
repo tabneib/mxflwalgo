@@ -2,12 +2,9 @@ package de.nhd.mxflwalgo.view;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -15,14 +12,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import de.nhd.mxflwalgo.algos.model.Arc;
-import de.nhd.mxflwalgo.algos.model.MArc;
-import de.nhd.mxflwalgo.algos.model.MGraph;
-import de.nhd.mxflwalgo.algos.model.MVertex;
-import de.nhd.mxflwalgo.algos.model.MaxFlowProblem;
+import de.nhd.mxflwalgo.model.Arc;
+import de.nhd.mxflwalgo.model.MArc;
+import de.nhd.mxflwalgo.model.MVertex;
+import de.nhd.mxflwalgo.model.MaxFlowProblem;
 
 /**
  * JPanel for displaying and updating a beautiful graph

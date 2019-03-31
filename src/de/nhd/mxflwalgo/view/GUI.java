@@ -24,9 +24,9 @@ import de.nhd.mxflwalgo.algos.Dinic;
 import de.nhd.mxflwalgo.algos.EdmondsKarp;
 import de.nhd.mxflwalgo.algos.FordFulkerson;
 import de.nhd.mxflwalgo.algos.MaxFlowAlgo;
-import de.nhd.mxflwalgo.algos.model.GraphFactory;
-import de.nhd.mxflwalgo.algos.model.MGraph;
-import de.nhd.mxflwalgo.algos.model.MaxFlowProblem;
+import de.nhd.mxflwalgo.model.GraphFactory;
+import de.nhd.mxflwalgo.model.MGraph;
+import de.nhd.mxflwalgo.model.MaxFlowProblem;
 
 public class GUI extends JFrame {
 

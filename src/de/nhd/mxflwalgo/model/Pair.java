@@ -1,4 +1,4 @@
-package de.nhd.mxflwalgo.algos.model;
+package de.nhd.mxflwalgo.model;
 
 public class Pair<X, Y> {
 	private X key;

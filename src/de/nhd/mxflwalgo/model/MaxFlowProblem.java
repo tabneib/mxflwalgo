@@ -1,4 +1,4 @@
-package de.nhd.mxflwalgo.algos.model;
+package de.nhd.mxflwalgo.model;
 
 public class MaxFlowProblem {
 	private MGraph graph;

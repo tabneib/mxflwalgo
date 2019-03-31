@@ -3,10 +3,10 @@ package de.nhd.mxflwalgo.algos;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import de.nhd.mxflwalgo.algos.model.MGraph;
-import de.nhd.mxflwalgo.algos.model.MVertex;
-import de.nhd.mxflwalgo.algos.model.MaxFlowProblem;
-import de.nhd.mxflwalgo.algos.model.ResArc;
+import de.nhd.mxflwalgo.model.MGraph;
+import de.nhd.mxflwalgo.model.MVertex;
+import de.nhd.mxflwalgo.model.MaxFlowProblem;
+import de.nhd.mxflwalgo.model.ResArc;
 
 public class FordFulkerson extends MaxFlowAlgo {
 

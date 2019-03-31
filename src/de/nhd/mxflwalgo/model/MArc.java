@@ -1,4 +1,4 @@
-package de.nhd.mxflwalgo.algos.model;
+package de.nhd.mxflwalgo.model;
 
 /**
  * Class representing an arc for the max flow problem
