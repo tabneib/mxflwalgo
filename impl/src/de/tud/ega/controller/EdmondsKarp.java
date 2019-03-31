@@ -38,13 +38,7 @@ public class EdmondsKarp extends MaxFlowAlgo {
 			this.finished = true;
 			return this.problem.getGraph();
 		}
-		// Highlighting stuffs
-		this.problem.getGraph().clearAllHighlight();
-		for (ResArc rArc : augPath.arcs) {
-			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
-			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
-			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());
-		}
+		highlightAugPath(augPath, true);
 		updateResGraph(augPath);
 		updateGraph(augPath);
 		return this.problem.getGraph();

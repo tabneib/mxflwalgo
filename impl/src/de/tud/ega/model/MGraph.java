@@ -4,41 +4,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * Class representing a graph
+ * Class representing a decoratable graph
  * 
  */
-public class MGraph {
-
-	private ArrayList<MVertex> vertices;
-	private ArrayList<Arc> arcs;
-
+public class MGraph extends Graph{
+	
 	private HashSet<MVertex> hightlightedVertices;
 	private HashSet<Arc> hightlightedArcs;
 
 	public MGraph(ArrayList<MVertex> vertices, ArrayList<Arc> arcs) {
-		this.vertices = vertices;
-		this.arcs = arcs;
+		super(vertices, arcs);
 		this.hightlightedVertices = new HashSet<>();
 		this.hightlightedArcs = new HashSet<>();
 	}
 
-	public ArrayList<Arc> getArcs() {
-		return arcs;
-	}
-
-	public ArrayList<MVertex> getVertices() {
-		return vertices;
-	}
-
-	public String toString() {
-		String str = "MGraph[" + vertices.size() + ", " + arcs.size() + "]\n";
-		for (Arc a : arcs)
-			str += a.toString() + "\t";
-
-		return str;
-	}
-	// TODO: further functionalities: Lists of arcs & nodes that should be
-	// highlighted for the purpose of
+	// Lists of arcs & nodes that should be highlighted for the purpose of
 	// describing intermediate steps of the algorithms
 
 	public boolean isHighlighted(Arc arc) {

@@ -105,8 +105,7 @@ public class GraphPanel extends JPanel {
 	private final MaxFlowProblem maxFlowProblem;
 
 	/**
-	 * Creates a new JGraphPanel with a given list of arcs and updates the scale
-	 * factor.
+	 * Creates a new JGraphPanel for the given max flow problem
 	 * 
 	 * @param arcs
 	 *            list of arcs
@@ -192,7 +191,8 @@ public class GraphPanel extends JPanel {
 	 * and color. If the given graphics and color are null, so do not draw anything but 
 	 * just calculate the position of the arrow head.
 	 * 
-	 * @param g1
+	 * @param g
+	 * @param color
 	 * @param x1
 	 *            x-coordinate of the startpoint
 	 * @param y1
@@ -201,11 +201,8 @@ public class GraphPanel extends JPanel {
 	 *            x-coordinate of the endpoint
 	 * @param y2
 	 *            y-coordinate of the endpoint
-	 * @param rotate
-	 *            optional rotation regarding the direction defined by start- &
-	 *            endpoints
 	 */
-	private Point drawdArrowHead(final Graphics g1, Color color, int x1, int y1, int x2,
+	private Point drawdArrowHead(final Graphics g, Color color, int x1, int y1, int x2,
 			int y2) {
 
 		double dx = x2 - x1, dy = y2 - y1;
@@ -225,12 +222,12 @@ public class GraphPanel extends JPanel {
 		AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
 		at.concatenate(AffineTransform.getRotateInstance(angle));
 		
-		if (g1 != null && color != null) {
-			Graphics2D g = (Graphics2D) g1.create();
-			g.setColor(color);
-			g.transform(at);
+		if (g != null && color != null) {
+			Graphics2D g2D = (Graphics2D) g.create();
+			g2D.setColor(color);
+			g2D.transform(at);
 
-			g.fillPolygon(
+			g2D.fillPolygon(
 					new int[] { (int) len, (int) len - ARROW_HEAD_SIZE,
 							(int) len - ARROW_HEAD_SIZE, (int) len },
 					new int[] { 0, -ARROW_HEAD_SIZE / 2, ARROW_HEAD_SIZE / 2, 0 }, 4);

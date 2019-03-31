@@ -31,18 +31,12 @@ public class FordFulkerson extends MaxFlowAlgo {
 	@Override
 	public MGraph runStep() {
 		AugmentingPath augPath = dfs();
-		if (augPath == null){
+		if (augPath == null) {
 			this.problem.getGraph().clearAllHighlight();
 			this.finished = true;
 			return this.problem.getGraph();
 		}
-		// Highlighting stuffs
-		this.problem.getGraph().clearAllHighlight();
-		for (ResArc rArc : augPath.arcs) {
-			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
-			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
-			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());
-		}
+		highlightAugPath(augPath, true);
 		updateResGraph(augPath);
 		updateGraph(augPath);
 		return this.problem.getGraph();
@@ -56,14 +50,13 @@ public class FordFulkerson extends MaxFlowAlgo {
 	private AugmentingPath dfs() {
 		String searchId = UUID.randomUUID().toString();
 		this.problem.getSource().setSeen(searchId);
-		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(),
-				Integer.MAX_VALUE, searchId);
+		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(), Integer.MAX_VALUE, searchId);
 	}
 
 	/**
 	 * 
 	 * @param currentNode
-	 *            The node that the DFS reaches in this round
+	 *            The node in residual graph that the DFS reaches in this round
 	 * @param currentPath
 	 *            The path from source to (including) the current node
 	 * @param augmentingValue
@@ -72,14 +65,12 @@ public class FordFulkerson extends MaxFlowAlgo {
 	 *            Id of the current DFS
 	 * @return
 	 */
-	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath,
-			int augmentingValue, String searchId) {
+	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath, int augmentingValue,
+			String searchId) {
 		for (ResArc arc : currentNode.getResIncidentArcs()) {
-			if (arc.getResValue() > 0
-					&& arc.getEndVertex().equals(this.problem.getTarget())) {
+			if (arc.getResValue() > 0 && arc.getEndVertex().equals(this.problem.getTarget())) {
 				currentPath.add(arc);
-				return new AugmentingPath(currentPath,
-						Math.min(augmentingValue, arc.getResValue()));
+				return new AugmentingPath(currentPath, Math.min(augmentingValue, arc.getResValue()));
 			} else if (arc.getResValue() > 0 && !arc.getEndVertex().isSeen(searchId)) {
 				arc.getEndVertex().setSeen(searchId);
 				currentPath.add(arc);

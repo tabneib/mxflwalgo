@@ -2,6 +2,10 @@ package de.tud.ega.model;
 
 import java.util.UUID;
 
+/**
+ * Abstract class representing a general arc
+ *
+ */
 public abstract class Arc implements Comparable<Arc>{
 
 	/**
@@ -10,7 +14,7 @@ public abstract class Arc implements Comparable<Arc>{
 	public final String id;
 	
 	/**
-	 * The arc that has the same start- and endpoint but different direction
+	 * The arc that has the same start- and end-point but different direction
 	 */
 	private Arc twinArc;
 	

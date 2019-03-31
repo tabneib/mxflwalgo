@@ -1,7 +1,7 @@
 package de.tud.ega.model;
 
 /**
- * Class representing a vertex
+ * Class representing an arc for the max flow problem
  * 
  */
 public class MArc extends Arc {

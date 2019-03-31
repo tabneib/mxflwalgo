@@ -2,6 +2,7 @@ package de.tud.ega.controller;
 
 import java.util.ArrayList;
 
+import de.tud.ega.controller.MaxFlowAlgo.AugmentingPath;
 import de.tud.ega.model.Arc;
 import de.tud.ega.model.MArc;
 import de.tud.ega.model.MGraph;
@@ -13,35 +14,35 @@ public abstract class MaxFlowAlgo {
 	protected final MaxFlowProblem problem;
 	protected boolean finished = false;
 	protected MGraph resGraph;
-	
+
 	public MaxFlowAlgo(MaxFlowProblem maxFlowProblem) {
 		this.problem = maxFlowProblem;
 		createResGraph();
 	}
-	
+
 	/**
 	 * Run the whole algorithm
-	 * @return
-	 * 			A graph that represents the final result
+	 * 
+	 * @return A graph that represents the final result
 	 */
 	public abstract MGraph run();
-	
+
 	/**
 	 * Run one step of the algorithm
-	 * @return
-	 * 			A graph that represents the intermediate result
+	 * 
+	 * @return A graph that represents the intermediate result
 	 */
 	public abstract MGraph runStep();
-	
+
 	/**
 	 * Check if the algorithm has already finished
-	 * @return
-	 * 			True if finished, False otherwise
+	 * 
+	 * @return True if finished, False otherwise
 	 */
 	public boolean isFinished() {
 		return finished;
 	};
-	
+
 	/**
 	 * Initialize the residual graph.
 	 */
@@ -50,11 +51,11 @@ public abstract class MaxFlowAlgo {
 		for (Arc arc : this.problem.getGraph().getArcs()) {
 			MArc mArc = (MArc) arc;
 
-			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(),
-					mArc.getCapacity() - mArc.getFlow(), null, arc, true);
+			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(), mArc.getCapacity() - mArc.getFlow(),
+					null, arc, true);
 
-			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(),
-					mArc.getFlow(), forward, arc, false);
+			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(), mArc.getFlow(), forward, arc,
+					false);
 
 			forward.setBackwardResArc(backward);
 			arcs.add(forward);
@@ -63,44 +64,39 @@ public abstract class MaxFlowAlgo {
 			mArc.getEndVertex().addResIncidentArc(backward);
 		}
 		this.resGraph = new MGraph(this.problem.getGraph().getVertices(), arcs);
-		System.out.println("[Max-Flow Algorithm] Residual Graph initialized. (V,A) = ("
-				+ this.resGraph.getVertices().size() + ", "
-				+ this.resGraph.getArcs().size() + ")");
+		System.out.println("[Max-Flow Algorithm] Residual Graph initialized. (|V|,|A|) = ("
+				+ this.resGraph.getVertices().size() + ", " + this.resGraph.getArcs().size() + ")");
 	}
-	
+
 	/**
-	 * Update the residual graph along a graph augmenting path
+	 * Update the residual graph along a flow augmenting path
 	 * 
 	 * @param augPath
-	 *            The given graph augmenting path
+	 *            The given flow augmenting path
 	 */
 	protected void updateResGraph(AugmentingPath augPath) {
-		System.out.println("AugPath = " + augPath);
 		for (ResArc arc : augPath.arcs) {
 			if (arc.getResValue() >= augPath.value) {
 				arc.setResValue(arc.getResValue() - augPath.value);
 				// Update the backward arc
-				arc.getBackwardResArc().setResValue(
-						arc.getBackwardResArc().getResValue() + augPath.value);
+				arc.getBackwardResArc().setResValue(arc.getBackwardResArc().getResValue() + augPath.value);
 			} else
-				throw new RuntimeException("Invalid augmenting value: " + augPath.value);
+				throw new RuntimeException("Augmenting value too large: " + augPath.value);
 		}
 	}
 
 	/**
-	 * Update the graph along a graph augmenting path
+	 * Update the graph along a flow augmenting path
 	 * 
 	 * @param augPath
-	 *            The given graph augmenting path
+	 *            The given flow augmenting path
 	 */
 	protected void updateGraph(AugmentingPath augPath) {
 		for (ResArc arc : augPath.arcs) {
 			if (arc.isForward())
-				((MArc) arc.getOriginalArc())
-						.setFlow(((MArc) arc.getOriginalArc()).getFlow() + augPath.value);
+				((MArc) arc.getOriginalArc()).setFlow(((MArc) arc.getOriginalArc()).getFlow() + augPath.value);
 			else
-				((MArc) arc.getOriginalArc())
-						.setFlow(((MArc) arc.getOriginalArc()).getFlow() - augPath.value);
+				((MArc) arc.getOriginalArc()).setFlow(((MArc) arc.getOriginalArc()).getFlow() - augPath.value);
 		}
 	}
 
@@ -109,7 +105,24 @@ public abstract class MaxFlowAlgo {
 	}
 
 	/**
-	 * Inner class that represents a graph augmenting path
+	 * Highlight all the arcs and nodes along the given augmenting path. The old
+	 * highlight is also cleared optionally.
+	 * 
+	 * @param path
+	 * @param clear	
+	 */
+	protected void highlightAugPath(AugmentingPath path, boolean clear) {
+		if (clear)
+			this.problem.getGraph().clearAllHighlight();
+		for (ResArc rArc : path.arcs) {
+			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
+			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
+			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());
+		}
+	}
+
+	/**
+	 * Inner class that represents a flow augmenting path
 	 *
 	 */
 	public class AugmentingPath {

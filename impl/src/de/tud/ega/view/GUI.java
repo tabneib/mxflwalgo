@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 
 import de.tud.ega.model.MGraph;
 import de.tud.ega.model.MaxFlowProblem;
+import de.tud.ega.controller.Dinic;
 import de.tud.ega.controller.EdmondsKarp;
 import de.tud.ega.controller.FordFulkerson;
 import de.tud.ega.controller.MaxFlowAlgo;
@@ -65,13 +66,14 @@ public class GUI extends JFrame {
 	MGraph mGraph;
 	//private static final int DEFAULT_VERTEX_NUMBER = 39;
 	private static final int DEFAULT_VERTEX_NUMBER = 53;
+	//private static final int DEFAULT_VERTEX_NUMBER = 7;
 	private static final int DEFAULT_MAX_CAPACITY = 100;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
 
 	@Deprecated
 	private String algoName;
-	private MaxFlowAlgo algorith;
+	private MaxFlowAlgo algorithm;
 	private MaxFlowProblem problem;
 
 	public static void main(String[] args) {
@@ -158,11 +160,11 @@ public class GUI extends JFrame {
 			}
 			this.problem = new MaxFlowProblem(this.mGraph);
 
-			if (this.algorith != null){
+			if (this.algorithm != null){
 				buttonGroupAlgo.clearSelection();
 				buttonRun.setEnabled(false);
 				buttonRunStep.setEnabled(false);
-				this.algorith = null;
+				this.algorithm = null;
 			}
 		}
 		graphPanel = new GraphPanel(this.problem);
@@ -291,7 +293,7 @@ public class GUI extends JFrame {
 		
 		// TODO: remove this when all features are implemented
 		//radioEdmondsKarp.setEnabled(false);
-		radioDinic.setEnabled(false);
+		//radioDinic.setEnabled(false);
 		radioGoldbergTarjan.setEnabled(false);
 
 		setListeners();
@@ -361,8 +363,8 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
-						if (!algorith.isFinished()) {
-							algorith.runStep();
+						if (!algorithm.isFinished()) {
+							algorithm.runStep();
 							Component gContainer = frame.getContentPane().getComponent(0);
 							GridBagLayout l = (GridBagLayout) frame.getContentPane()
 									.getLayout();
@@ -387,7 +389,7 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
-						algorith.run();
+						algorithm.run();
 						Component gContainer = frame.getContentPane().getComponent(0);
 						GridBagLayout l = (GridBagLayout) frame.getContentPane()
 								.getLayout();
@@ -412,17 +414,20 @@ public class GUI extends JFrame {
 				algoName = FORD_FULKERSON;
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
-				algorith = new FordFulkerson(problem);
+				algorithm = new FordFulkerson(problem);
 			}
 			else if (radioEdmondsKarp.isSelected()) {
 				algoName = EDMONDS_KARP;
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
-				algorith = new EdmondsKarp(problem);
+				algorithm = new EdmondsKarp(problem);
 			}
 			else if (radioDinic.isSelected()) {
 				algoName = DINIC;
 				// TODO
+				buttonRun.setEnabled(true);
+				buttonRunStep.setEnabled(true);
+				algorithm = new Dinic(problem);
 			}
 			else if (radioGoldbergTarjan.isSelected()) {
 				algoName = GOLDBERG_TARJAN;
