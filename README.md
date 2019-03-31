@@ -13,14 +13,14 @@ one single step of the algorithm. The vertices and arcs are highlighted accordin
 ###### GUI showing a generated maximal-planar graph containing 55 vertices and a max arc capacity of 100:
 ![Main GUI](images/gui.png)
 
-###### One intermediate step of Ford-Fulkerson:
+###### One intermediate step of Ford-Fulkerson with the flow augmenting path found by DFS highlighted:
 <img src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/fordfulkerson-1step.png" 
 data-canonical-src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/fordfulkerson-1step.png" width="600"/>
 
-###### One intermediate step of Edmonds-Karp:
+###### One intermediate step of Edmonds-Karp with the flow augmenting path found by BFS highlighted:
 <img src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/edmondskarp-1step.png" 
 data-canonical-src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/edmondskarp-1step.png" width="600"/>
 
-###### One intermediate step of Dinic:
+###### One intermediate step of Dinic with the blocking flow highlighted:
 <img src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/dinic-1step.png" 
 data-canonical-src="https://raw.githubusercontent.com/tabneib/mxflwalgo/master/images/dinic-1step.png" width="600"/>
