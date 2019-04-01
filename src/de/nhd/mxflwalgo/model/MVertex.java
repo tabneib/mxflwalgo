@@ -21,7 +21,7 @@ public class MVertex extends Point {
 	/**
 	 * List of arcs in the residual graph that have this vertex as startpoint
 	 */
-	private ArrayList<ResArc> resIncidentArcs;
+	private ArrayList<ResArc> incidentResArcs;
 
 	/**
 	 * List of arcs in the level graph that have this vertex as startpoint
@@ -33,6 +33,12 @@ public class MVertex extends Point {
 	 * search
 	 */
 	private Pair<String, ArrayList<ResArc>> searchPredecessorArcs;
+
+	/**
+	 * The index of the current incident residual arc being considered, used in
+	 * Goldberg-Tarjan
+	 */
+	private int currentResArcIdx = 0;
 
 	/**
 	 * The index of the current arc in the level graph for a given DFS id
@@ -74,6 +80,22 @@ public class MVertex extends Point {
 	private HashSet<String> dfsRemoved;
 
 	/**
+	 * The height of this vertex (the distance to target) which is a VDL This is
+	 * used in Goldberg-Tarjan
+	 */
+	private int height = 0;
+
+	/**
+	 * Excess value of this vertex, used in Goldberg-Tarjan
+	 */
+	private int excess = 0;
+
+	/**
+	 * The information if this is the source node is needed in Goldberg-Tarjan
+	 */
+	private boolean isSource = false;
+
+	/**
 	 * Construct a point by its coordinates
 	 * 
 	 * @param x
@@ -84,7 +106,7 @@ public class MVertex extends Point {
 	public MVertex(int x, int y) {
 		super(x, y);
 		this.incidentArcs = new ArrayList<>();
-		this.resIncidentArcs = new ArrayList<>();
+		this.incidentResArcs = new ArrayList<>();
 	}
 
 	@Override
@@ -117,9 +139,12 @@ public class MVertex extends Point {
 
 	/**
 	 * Determine the next incident arc in the level graph. This is used in DFS.
-	 * @param dfsSearchId	The ID of the corresponding DFS
-	 * @param bfsSearchId	The ID of the BFS that generates the level graph
-	 * @return	The next incident residual arc or null if no more such arc
+	 * 
+	 * @param dfsSearchId
+	 *            The ID of the corresponding DFS
+	 * @param bfsSearchId
+	 *            The ID of the BFS that generates the level graph
+	 * @return The next incident residual arc or null if no more such arc
 	 */
 	public ResArc getNextLevelArc(String dfsSearchId, String bfsSearchId) {
 		if (!this.incidentLevelArcs.getKey().equals(bfsSearchId))
@@ -135,6 +160,10 @@ public class MVertex extends Point {
 		return this.incidentLevelArcs.getValue()
 				.get(this.currentLevelArcIdx.getValue() - 1);
 	}
+
+	// public ResArc getNextResArc(){
+	//
+	// }
 
 	/**
 	 * Add an arc into the list of incident arcs
@@ -162,9 +191,9 @@ public class MVertex extends Point {
 	 * @return true if added, false if already existed
 	 */
 	public boolean addResIncidentArc(ResArc arc) {
-		if (this.resIncidentArcs.contains(arc))
+		if (this.incidentResArcs.contains(arc))
 			return false;
-		this.resIncidentArcs.add(arc);
+		this.incidentResArcs.add(arc);
 		return true;
 	}
 
@@ -176,11 +205,11 @@ public class MVertex extends Point {
 	 * @return true if removed, false if not yet existed
 	 */
 	public boolean removeResIncidentArc(ResArc arc) {
-		return this.resIncidentArcs.remove(arc);
+		return this.incidentResArcs.remove(arc);
 	}
 
-	public ArrayList<ResArc> getResIncidentArcs() {
-		return this.resIncidentArcs;
+	public ArrayList<ResArc> getIncidentResArcs() {
+		return this.incidentResArcs;
 	}
 
 	public boolean addIncidentLevelArcs(String searchId, ResArc arc) {
@@ -323,5 +352,68 @@ public class MVertex extends Point {
 
 	public void setParent(Arc parent) {
 		this.parent = parent;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getExcess() {
+		return excess;
+	}
+
+	public void setExcess(int excess) {
+		if (this.isSource)
+			return;
+		this.excess = excess;
+	}
+
+	public boolean isSource() {
+		return isSource;
+	}
+
+	public void setSource() {
+		this.isSource = true;
+		this.excess = Integer.MAX_VALUE;
+	}
+
+	/**
+	 * Iterate the list of all incident residual arcs of this vertex and return
+	 * the current arc
+	 * 
+	 * @return
+	 */
+	public ResArc getCurrentResArc() {
+		if (this.incidentResArcs.isEmpty())
+			throw new RuntimeException("No incident residual arc!");
+		if (this.currentResArcIdx >= this.incidentResArcs.size())
+			return null;
+		return this.incidentResArcs.get(this.currentResArcIdx++);
+	}
+
+	/**
+	 * Reset index and start again from the beginning of the list of incident
+	 * residual arcs of this vertex
+	 */
+	public void resetCurrentResArc() {
+		this.currentResArcIdx = 0;
+	}
+
+	/**
+	 * Calculate thi minmal height among all vertices that are the end points of
+	 * the incident residual arcs of this vertex
+	 * 
+	 * @return
+	 */
+	public int getMinIncidentResArcHeight() {
+		int minHeight = Integer.MAX_VALUE;
+		for (ResArc arc : this.incidentResArcs)
+			if (arc.getResValue() > 0)
+				minHeight = Math.min(arc.getEndVertex().getHeight(), minHeight);
+		return minHeight;
 	}
 }

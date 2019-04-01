@@ -55,7 +55,7 @@ public class EdmondsKarp extends MaxFlowAlgo {
 		
 		while (!queue.isEmpty()) {
 			MVertex parent = queue.removeFirst();
-			for (ResArc childArc : parent.getResIncidentArcs()) {
+			for (ResArc childArc : parent.getIncidentResArcs()) {
 				
 				if (childArc.getEndVertex().isSeen(bfsSearchId) || 
 						childArc.getResValue() == 0)

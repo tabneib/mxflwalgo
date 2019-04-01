@@ -52,6 +52,25 @@ public class ResArc extends Arc {
 					"Flow value to add too large: " + flowValue + " > " + this.resValue);
 	}
 
+	/**
+	 * Push the largest flow value onto this arc and update all related arcs and
+	 * vertices accordingly
+	 */
+	public void pushFlow() {
+		int flowValue = Math.min(this.startVertex.getExcess(), this.resValue);
+		if (flowValue <= 0)
+			throw new RuntimeException("There is nothing to push! Arc: " + this + " : "
+					+ this.startVertex.getExcess() + "-" + this.resValue + "->"
+					+ this.endVertex.getExcess());
+		this.addFlow(flowValue);
+		this.endVertex.setExcess(this.endVertex.getExcess() + flowValue);
+		this.startVertex.setExcess(this.startVertex.getExcess() - flowValue);
+	}
+
+	public boolean isAdmissible() {
+		return this.startVertex.getHeight() == (this.endVertex.getHeight() + 1);
+	}
+
 	public int getResValue() {
 		return resValue;
 	}

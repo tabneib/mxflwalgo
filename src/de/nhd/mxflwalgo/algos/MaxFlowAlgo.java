@@ -1,6 +1,7 @@
 package de.nhd.mxflwalgo.algos;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import de.nhd.mxflwalgo.model.Arc;
 import de.nhd.mxflwalgo.model.MArc;
@@ -77,7 +78,7 @@ public abstract class MaxFlowAlgo {
 		for (ResArc arc : augPath.arcs)
 			arc.addFlow(augPath.value);
 	}
-
+	
 	public MGraph getResGraph() {
 		return this.resGraph;
 	}
@@ -90,9 +91,18 @@ public abstract class MaxFlowAlgo {
 	 * @param clear	
 	 */
 	protected void highlightAugPath(AugmentingPath path, boolean clear) {
+		this.highlightArcs(path.arcs, clear);
+	}
+	
+	/**
+	 * Highlight all original arcs of the given residual arcs
+	 * @param arcs
+	 * @param clear
+	 */
+	protected void highlightArcs(Collection<ResArc> arcs, boolean clear) {
 		if (clear)
 			this.problem.getGraph().clearAllHighlight();
-		for (ResArc rArc : path.arcs) {
+		for (ResArc rArc : arcs) {
 			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
 			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
 			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());

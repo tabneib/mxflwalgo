@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import de.nhd.mxflwalgo.algos.Dinic;
 import de.nhd.mxflwalgo.algos.EdmondsKarp;
 import de.nhd.mxflwalgo.algos.FordFulkerson;
+import de.nhd.mxflwalgo.algos.GoldbergTarjan;
 import de.nhd.mxflwalgo.algos.MaxFlowAlgo;
 import de.nhd.mxflwalgo.model.GraphFactory;
 import de.nhd.mxflwalgo.model.MGraph;
@@ -294,7 +295,7 @@ public class GUI extends JFrame {
 		// TODO: remove this when all features are implemented
 		//radioEdmondsKarp.setEnabled(false);
 		//radioDinic.setEnabled(false);
-		radioGoldbergTarjan.setEnabled(false);
+		//radioGoldbergTarjan.setEnabled(false);
 
 		setListeners();
 		return panel;
@@ -424,7 +425,6 @@ public class GUI extends JFrame {
 			}
 			else if (radioDinic.isSelected()) {
 				algoName = DINIC;
-				// TODO
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
 				algorithm = new Dinic(problem);
@@ -432,6 +432,9 @@ public class GUI extends JFrame {
 			else if (radioGoldbergTarjan.isSelected()) {
 				algoName = GOLDBERG_TARJAN;
 				// TODO
+				buttonRun.setEnabled(true);
+				buttonRunStep.setEnabled(true);
+				algorithm = new GoldbergTarjan(problem);
 			}
 			else
 				throw new RuntimeException("Unknown chosen algorithm!");

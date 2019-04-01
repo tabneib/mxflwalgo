@@ -65,7 +65,7 @@ public class FordFulkerson extends MaxFlowAlgo {
 	 */
 	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath, int augmentingValue,
 			String searchId) {
-		for (ResArc arc : currentNode.getResIncidentArcs()) {
+		for (ResArc arc : currentNode.getIncidentResArcs()) {
 			if (arc.getResValue() > 0 && arc.getEndVertex().equals(this.problem.getTarget())) {
 				currentPath.add(arc);
 				return new AugmentingPath(currentPath, Math.min(augmentingValue, arc.getResValue()));

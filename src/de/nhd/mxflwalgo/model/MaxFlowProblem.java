@@ -19,6 +19,7 @@ public class MaxFlowProblem {
 	 */
 	private void determineSourceTarget() {
 		this.source = this.graph.getVertices().get(0);
+		this.source.setSource();
 		this.target = this.graph.getVertices().get(this.graph.getVertices().size() - 1);
 	}
 	

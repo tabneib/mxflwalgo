@@ -69,7 +69,7 @@ public class Dinic extends MaxFlowAlgo {
 
 		while (!queue.isEmpty()) {
 			MVertex parent = queue.removeFirst();
-			for (ResArc childArc : parent.getResIncidentArcs()) {
+			for (ResArc childArc : parent.getIncidentResArcs()) {
 								
 				if (childArc.getResValue() == 0)
 					continue;
