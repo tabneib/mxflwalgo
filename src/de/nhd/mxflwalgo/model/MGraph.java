@@ -7,8 +7,8 @@ import java.util.HashSet;
  * Class representing a decoratable graph
  * 
  */
-public class MGraph extends Graph{
-	
+public class MGraph extends Graph {
+
 	private HashSet<MVertex> hightlightedVertices;
 	private HashSet<Arc> hightlightedArcs;
 
@@ -28,21 +28,31 @@ public class MGraph extends Graph{
 	public boolean isHighlighted(MVertex vertex) {
 		return this.hightlightedVertices.contains(vertex);
 	}
-	
+
 	public boolean highlightMode() {
 		return !this.hightlightedArcs.isEmpty() || !this.hightlightedVertices.isEmpty();
 	}
-	
+
 	public void clearAllHighlight() {
 		this.hightlightedArcs.clear();
 		this.hightlightedVertices.clear();
 	}
-	
+
 	public void highlightArc(Arc arc) {
 		this.hightlightedArcs.add(arc);
 	}
 
 	public void hightlightVertex(MVertex vertex) {
 		this.hightlightedVertices.add(vertex);
+	}
+
+	/**
+	 * Reset all calculated stuffs of this graph
+	 */
+	public void reset() {
+		for (Arc a : this.getArcs())
+			a.reset();
+		for (MVertex v : this.getVertices())
+			v.reset();
 	}
 }

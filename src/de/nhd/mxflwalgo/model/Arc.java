@@ -124,6 +124,8 @@ public abstract class Arc implements Comparable<Arc>{
 	public void setTwinArc(Arc twinArc) {
 		this.twinArc = twinArc;
 	}
+	
+	public abstract void reset();
 
 	/**
 	 * Possible directions of the arcs

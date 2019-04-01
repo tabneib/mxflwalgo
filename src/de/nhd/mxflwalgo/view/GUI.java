@@ -1,5 +1,6 @@
 package de.nhd.mxflwalgo.view;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -9,7 +10,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 import de.nhd.mxflwalgo.algos.Dinic;
 import de.nhd.mxflwalgo.algos.EdmondsKarp;
@@ -39,19 +45,29 @@ public class GUI extends JFrame {
 	public static final int MENU_CONTAINER_WIDTH = 380;
 	public static final int BOXES_PADDING = 10;
 	public static final int SCROLL_VIEW_PADDING = 20;
-	
+	public static final int DEFAULT_DELAY = 500;
+
 	private static final String FORD_FULKERSON = "FORD_FULKERSON";
 	private static final String EDMONDS_KARP = "EDMONDS_KARP";
 	private static final String DINIC = "DINIC";
 	private static final String GOLDBERG_TARJAN = "GOLDBERG_TARJAN";
+
+	// GUI States
+	private static final String STATE_GRAPH_GENERATED = "STATE_GRAPH_GENERATED";
+	private static final String STATE_ALGO_SELECTED = "STATE_ALGO_SELECTED";
+	private static final String STATE_RUNNING = "STATE_RUNNING";
+	private static final String STATE_PAUSED = "STATE_PAUSED";
+	private static final String STATE_FINISHED = "STATE_FINISHED";
 
 	// GUI Components
 	private JLabel labelStatusBar;
 	private JFrame frame;
 	private JLabel labelInsGen;
 	private JTextField textFieldParams;
+	private JTextField textFieldDelay;
 	private JButton buttonInsGen;
 	private JLabel labelParams;
+	private JLabel labelDelay;
 	private JLabel labelAlgo;
 	private JRadioButton radioFordFulkerson;
 	private JRadioButton radioEdmondsKarp;
@@ -59,15 +75,16 @@ public class GUI extends JFrame {
 	private JRadioButton radioGoldbergTarjan;
 	private JButton buttonRun;
 	private JButton buttonRunStep;
+	private JButton buttonReset;
 	private ButtonGroup buttonGroupAlgo;
 
 	private final Font defaultFont = new JLabel().getFont();
 
 	// Data
 	MGraph mGraph;
-	//private static final int DEFAULT_VERTEX_NUMBER = 39;
+	// private static final int DEFAULT_VERTEX_NUMBER = 39;
 	private static final int DEFAULT_VERTEX_NUMBER = 53;
-	//private static final int DEFAULT_VERTEX_NUMBER = 7;
+	// private static final int DEFAULT_VERTEX_NUMBER = 7;
 	private static final int DEFAULT_MAX_CAPACITY = 100;
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
@@ -76,6 +93,11 @@ public class GUI extends JFrame {
 	private String algoName;
 	private MaxFlowAlgo algorithm;
 	private MaxFlowProblem problem;
+
+	private Timer timer = new Timer();
+	private TimerTask algoRunTask = null;
+
+	private String state = STATE_GRAPH_GENERATED;
 
 	public static void main(String[] args) {
 		new GUI();
@@ -143,17 +165,19 @@ public class GUI extends JFrame {
 	}
 
 	/**
-	 * Create a panel that displays the graph
+	 * Create a panel that displays the graph of the current problem instance.
+	 * If there is no current problem => create a new instance.
 	 * 
 	 * @return
 	 */
 	private Container makeGraphContainer() {
 
 		GraphPanel graphPanel;
-		//mGraph = getSampleGraph();
+		// mGraph = getSampleGraph();
 		if (this.mGraph == null) {
 			try {
-				this.mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
+				this.mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber,
+						maxCapacity);
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
 						JOptionPane.INFORMATION_MESSAGE);
@@ -161,7 +185,7 @@ public class GUI extends JFrame {
 			}
 			this.problem = new MaxFlowProblem(this.mGraph);
 
-			if (this.algorithm != null){
+			if (this.algorithm != null) {
 				buttonGroupAlgo.clearSelection();
 				buttonRun.setEnabled(false);
 				buttonRunStep.setEnabled(false);
@@ -233,8 +257,7 @@ public class GUI extends JFrame {
 		c.gridy = 3;
 		c.gridwidth = 2;
 		panel.add(labelParams, c);
-		
-		
+
 		// Algos
 
 		labelAlgo = new JLabel("Algorithm");
@@ -244,58 +267,81 @@ public class GUI extends JFrame {
 		c.gridy = 4;
 		c.gridwidth = 3;
 		panel.add(labelAlgo, c);
-		
+
 		radioFordFulkerson = new JRadioButton("Ford-Fulkerson");
 		c.gridx = 0;
 		c.gridy = 5;
 		c.gridwidth = 1;
 		panel.add(radioFordFulkerson, c);
-		
+
 		radioEdmondsKarp = new JRadioButton("Edmonds-Karp");
 		c.gridx = 1;
 		c.gridy = 5;
 		c.gridwidth = 1;
 		panel.add(radioEdmondsKarp, c);
-			
+
 		radioDinic = new JRadioButton("Dinic");
 		c.gridx = 0;
 		c.gridy = 6;
 		c.gridwidth = 1;
 		panel.add(radioDinic, c);
-		
+
 		radioGoldbergTarjan = new JRadioButton("Goldberg-Tarjan");
 		c.gridx = 1;
 		c.gridy = 6;
 		c.gridwidth = 1;
 		panel.add(radioGoldbergTarjan, c);
-			
+
 		buttonGroupAlgo = new ButtonGroup();
 		buttonGroupAlgo.add(radioFordFulkerson);
 		buttonGroupAlgo.add(radioEdmondsKarp);
 		buttonGroupAlgo.add(radioDinic);
 		buttonGroupAlgo.add(radioGoldbergTarjan);
-		//radioFordFulkerson.setSelected(true);
+		// radioFordFulkerson.setSelected(true);
 
 		buttonRunStep = new JButton("1 Step");
 		c.gridx = 0;
 		c.gridy = 8;
 		c.gridwidth = 1;
-		buttonRunStep.setPreferredSize(new Dimension(100, 30));
+		buttonRunStep.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonRunStep, c);
 		buttonRunStep.setEnabled(false);
-		
+
 		buttonRun = new JButton("Run");
 		c.gridx = 1;
 		c.gridy = 8;
 		c.gridwidth = 1;
-		buttonRun.setPreferredSize(new Dimension(100, 30));
+		buttonRun.setPreferredSize(new Dimension(100, 20));
 		panel.add(buttonRun, c);
 		buttonRun.setEnabled(false);
-		
-		// TODO: remove this when all features are implemented
-		//radioEdmondsKarp.setEnabled(false);
-		//radioDinic.setEnabled(false);
-		//radioGoldbergTarjan.setEnabled(false);
+
+		buttonReset = new JButton("Reset");
+		c.gridx = 2;
+		c.gridy = 8;
+		c.gridwidth = 1;
+		buttonReset.setPreferredSize(new Dimension(100, 20));
+		panel.add(buttonReset, c);
+		buttonReset.setEnabled(false);
+
+		labelDelay = new JLabel("Running Delay:");
+		c.gridx = 0;
+		c.gridy = 9;
+		c.gridwidth = 1;
+		panel.add(labelDelay, c);
+		labelDelay.setEnabled(false);
+
+		textFieldDelay = new JTextField("" + DEFAULT_DELAY);
+		c.gridx = 1;
+		c.gridy = 9;
+		c.gridwidth = 1;
+		textFieldDelay.setPreferredSize(new Dimension(80, 20));
+		c.fill = GridBagConstraints.VERTICAL;
+		textFieldDelay.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createLineBorder(panel.getBackground(), 5),
+				new EtchedBorder()));
+		panel.add(textFieldDelay, c);
+		textFieldDelay.setEnabled(false);
+		c.fill = GridBagConstraints.NONE;
 
 		setListeners();
 		return panel;
@@ -310,32 +356,34 @@ public class GUI extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				// Parse arguments
-				final String[] argStrs = textFieldParams.getText().split(" ");
 
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 					@Override
 					public void run() {
-						
+
+						removeAlgoRunTask();
+						updateState(STATE_GRAPH_GENERATED);
+
 						try {
+							// Parse arguments
+							final String[] argStrs = textFieldParams.getText().split(" ");
+
 							if (argStrs.length != 2)
 								throw new Exception();
-							else{
+							else {
 								vertexNumber = Integer.parseInt(argStrs[0]);
 								maxCapacity = Integer.parseInt(argStrs[1]);
 							}
-								
-						}
-						catch (Exception e) {
-							JOptionPane.showMessageDialog(null, "Invalid arguments", 
+
+						} catch (Exception e) {
+							JOptionPane.showMessageDialog(null, "Invalid arguments",
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
-						
+
 						mGraph = null;
 						textFieldParams.setText(vertexNumber + " " + maxCapacity);
-						
+
 						Component gContainer = frame.getContentPane().getComponent(0);
 						GridBagLayout l = (GridBagLayout) frame.getContentPane()
 								.getLayout();
@@ -354,93 +402,278 @@ public class GUI extends JFrame {
 		radioEdmondsKarp.addActionListener(new AlgorithmSelectListener());
 		radioDinic.addActionListener(new AlgorithmSelectListener());
 		radioGoldbergTarjan.addActionListener(new AlgorithmSelectListener());
-		
-		// Run 1 step 
+
+		// Run 1 step
 		buttonRunStep.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 					@Override
 					public void run() {
-						if (!algorithm.isFinished()) {
-							algorithm.runStep();
-							Component gContainer = frame.getContentPane().getComponent(0);
-							GridBagLayout l = (GridBagLayout) frame.getContentPane()
-									.getLayout();
-							GridBagConstraints c = l.getConstraints(gContainer);
-	
-							frame.getContentPane().remove(gContainer);
-							frame.getContentPane().add(makeGraphContainer(), c, 0);
-							frame.getContentPane().validate();
-						}
-						// TODO: Else => finished => notification!
+						removeAlgoRunTask();
+						updateState(STATE_PAUSED);
+						runStep();
 					}
 				});
 			}
 		});
-		
-		// Run the whole algorithm
+
+		// Run the whole algorithm stepwise with given delay
 		buttonRun.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 					@Override
 					public void run() {
-						algorithm.run();
+						if (state.equals(STATE_RUNNING)) {
+							removeAlgoRunTask();
+							updateState(STATE_PAUSED);
+						} else {
+							algoRunTask = genAlgoRunTask();
+
+							try {
+								final int delay = Integer
+										.parseInt(textFieldDelay.getText());
+								timer.schedule(algoRunTask, 0, delay);
+								updateState(STATE_RUNNING);
+							} catch (Exception e) {
+								JOptionPane.showMessageDialog(null, "Invalid delay",
+										"Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				});
+			}
+		});
+
+		buttonReset.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						algorithm.reset();
 						Component gContainer = frame.getContentPane().getComponent(0);
-						GridBagLayout l = (GridBagLayout) frame.getContentPane()
+						GridBagLayout layout = (GridBagLayout) frame.getContentPane()
 								.getLayout();
-						GridBagConstraints c = l.getConstraints(gContainer);
+						GridBagConstraints c = layout.getConstraints(gContainer);
 
 						frame.getContentPane().remove(gContainer);
 						frame.getContentPane().add(makeGraphContainer(), c, 0);
 						frame.getContentPane().validate();
+						updateState(STATE_ALGO_SELECTED);
 					}
 				});
+
 			}
 		});
-		
+
 	}
 
-	
 	private class AlgorithmSelectListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (radioFordFulkerson.isSelected()) {
 				algoName = FORD_FULKERSON;
-				buttonRun.setEnabled(true);
-				buttonRunStep.setEnabled(true);
 				algorithm = new FordFulkerson(problem);
-			}
-			else if (radioEdmondsKarp.isSelected()) {
+				updateState(STATE_ALGO_SELECTED);
+			} else if (radioEdmondsKarp.isSelected()) {
 				algoName = EDMONDS_KARP;
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
 				algorithm = new EdmondsKarp(problem);
-			}
-			else if (radioDinic.isSelected()) {
+				updateState(STATE_ALGO_SELECTED);
+			} else if (radioDinic.isSelected()) {
 				algoName = DINIC;
-				buttonRun.setEnabled(true);
-				buttonRunStep.setEnabled(true);
 				algorithm = new Dinic(problem);
-			}
-			else if (radioGoldbergTarjan.isSelected()) {
+				updateState(STATE_ALGO_SELECTED);
+			} else if (radioGoldbergTarjan.isSelected()) {
 				algoName = GOLDBERG_TARJAN;
-				// TODO
-				buttonRun.setEnabled(true);
-				buttonRunStep.setEnabled(true);
 				algorithm = new GoldbergTarjan(problem);
-			}
-			else
+				updateState(STATE_ALGO_SELECTED);
+			} else
 				throw new RuntimeException("Unknown chosen algorithm!");
-			
+
 		}
 	}
-	
-	
+
+	/**
+	 * Run one single step of the current chosen algorithm
+	 */
+	private void runStep() {
+		if (!algorithm.isFinished()) {
+			algorithm.runStep();
+			Component gContainer = frame.getContentPane().getComponent(0);
+			GridBagLayout layout = (GridBagLayout) frame.getContentPane().getLayout();
+			GridBagConstraints c = layout.getConstraints(gContainer);
+
+			frame.getContentPane().remove(gContainer);
+			frame.getContentPane().add(makeGraphContainer(), c, 0);
+			frame.getContentPane().validate();
+		}
+		if (algorithm.isFinished()) {
+			removeAlgoRunTask();
+			updateState(STATE_FINISHED);
+		}
+	}
+
+	/**
+	 * Generate the asynchronous task to run the algorithm periodically
+	 * 
+	 * @return
+	 */
+	private TimerTask genAlgoRunTask() {
+		return new TimerTask() {
+
+			@Override
+			public void run() {
+				runStep();
+				Component gContainer = frame.getContentPane().getComponent(0);
+				GridBagLayout l = (GridBagLayout) frame.getContentPane().getLayout();
+				GridBagConstraints c = l.getConstraints(gContainer);
+
+				frame.getContentPane().remove(gContainer);
+				frame.getContentPane().add(makeGraphContainer(), c, 0);
+				frame.getContentPane().validate();
+			}
+		};
+	}
+
+	/**
+	 * Cancel and remove any asynchronous algorithm running task
+	 */
+	private void removeAlgoRunTask() {
+		if (algoRunTask != null) {
+			algoRunTask.cancel();
+			algoRunTask = null;
+		}
+	}
+
+	/**
+	 * Update the GUI to the given state. The state transition is validated
+	 * first.
+	 * 
+	 * @param newState
+	 */
+	private void updateState(String newState) {
+		switch (newState) {
+			case STATE_GRAPH_GENERATED :
+				if (!this.state.equals(STATE_GRAPH_GENERATED)
+						&& !this.state.equals(STATE_ALGO_SELECTED))
+					throw new RuntimeException(
+							"Invalid state change: " + state + " -> " + newState);
+				this.state = newState;
+				labelInsGen.setEnabled(true);
+				textFieldParams.setEnabled(true);
+				buttonInsGen.setEnabled(true);
+				labelParams.setEnabled(true);
+				labelAlgo.setEnabled(true);
+				radioDinic.setEnabled(true);
+				radioEdmondsKarp.setEnabled(true);
+				radioFordFulkerson.setEnabled(true);
+				radioGoldbergTarjan.setEnabled(true);
+				buttonRunStep.setEnabled(false);
+				buttonRun.setEnabled(false);
+				buttonReset.setEnabled(false);
+				labelDelay.setEnabled(false);
+				textFieldDelay.setEnabled(false);
+
+				buttonRun.setText("Run");
+				break;
+			case STATE_ALGO_SELECTED :
+				if (this.state.equals(STATE_RUNNING))
+					throw new RuntimeException("Invalid state change");
+				this.state = newState;
+				labelInsGen.setEnabled(true);
+				textFieldParams.setEnabled(true);
+				buttonInsGen.setEnabled(true);
+				labelParams.setEnabled(true);
+				labelAlgo.setEnabled(true);
+				radioDinic.setEnabled(true);
+				radioEdmondsKarp.setEnabled(true);
+				radioFordFulkerson.setEnabled(true);
+				radioGoldbergTarjan.setEnabled(true);
+				buttonRunStep.setEnabled(true);
+				buttonRun.setEnabled(true);
+				buttonReset.setEnabled(false);
+				labelDelay.setEnabled(true);
+				textFieldDelay.setEnabled(true);
+
+				buttonRun.setText("Run");
+				break;
+			case STATE_RUNNING :
+				if (this.state.equals(STATE_GRAPH_GENERATED)
+						|| this.state.equals(STATE_FINISHED))
+					throw new RuntimeException("Invalid state change");
+				this.state = newState;
+				labelInsGen.setEnabled(false);
+				textFieldParams.setEnabled(false);
+				buttonInsGen.setEnabled(false);
+				labelParams.setEnabled(false);
+				labelAlgo.setEnabled(false);
+				radioDinic.setEnabled(false);
+				radioEdmondsKarp.setEnabled(false);
+				radioFordFulkerson.setEnabled(false);
+				radioGoldbergTarjan.setEnabled(false);
+				buttonRunStep.setEnabled(false);
+				buttonRun.setEnabled(true);
+				buttonReset.setEnabled(false);
+				labelDelay.setEnabled(false);
+				textFieldDelay.setEnabled(false);
+
+				buttonRun.setText("Pause");
+				break;
+			case STATE_PAUSED :
+				if (!this.state.equals(STATE_RUNNING)
+						&& !this.state.equals(STATE_ALGO_SELECTED)
+						&& !this.state.equals(STATE_PAUSED))
+					throw new RuntimeException("Invalid state change");
+				this.state = newState;
+				labelInsGen.setEnabled(false);
+				textFieldParams.setEnabled(false);
+				buttonInsGen.setEnabled(false);
+				labelParams.setEnabled(false);
+				labelAlgo.setEnabled(false);
+				radioDinic.setEnabled(false);
+				radioEdmondsKarp.setEnabled(false);
+				radioFordFulkerson.setEnabled(false);
+				radioGoldbergTarjan.setEnabled(false);
+				buttonRunStep.setEnabled(true);
+				buttonRun.setEnabled(true);
+				buttonReset.setEnabled(true);
+				labelDelay.setEnabled(true);
+				textFieldDelay.setEnabled(true);
+
+				buttonRun.setText("Run");
+				break;
+			case STATE_FINISHED :
+				if (!this.state.equals(STATE_RUNNING) && !this.state.equals(STATE_PAUSED))
+					throw new RuntimeException("Invalid state change");
+				this.state = newState;
+				labelInsGen.setEnabled(false);
+				textFieldParams.setEnabled(false);
+				buttonInsGen.setEnabled(false);
+				labelParams.setEnabled(false);
+				labelAlgo.setEnabled(false);
+				radioDinic.setEnabled(false);
+				radioEdmondsKarp.setEnabled(false);
+				radioFordFulkerson.setEnabled(false);
+				radioGoldbergTarjan.setEnabled(false);
+				buttonRunStep.setEnabled(false);
+				buttonRun.setEnabled(false);
+				buttonReset.setEnabled(true);
+				labelDelay.setEnabled(false);
+				textFieldDelay.setEnabled(false);
+
+				buttonRun.setText("Run");
+				break;
+		}
+	}
 }

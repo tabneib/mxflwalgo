@@ -133,4 +133,13 @@ public abstract class MaxFlowAlgo {
 			return str.substring(0, str.length() - 2);
 		}
 	}
+	
+	/**
+	 * Reset all calculated stuffs
+	 */
+	public void reset() {
+		this.resGraph.reset();
+		this.problem.getGraph().reset();
+		this.finished = false;
+	}
 }

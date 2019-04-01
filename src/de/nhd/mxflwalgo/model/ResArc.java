@@ -94,4 +94,12 @@ public class ResArc extends Arc {
 	public boolean isForward() {
 		return this.isForward;
 	}
+
+	/**
+	 * Reset all calculated stuffs
+	 */
+	public void reset() {
+		this.resValue = this.isForward ? ((MArc) originalArc).getCapacity() : 0;
+		
+	}
 }

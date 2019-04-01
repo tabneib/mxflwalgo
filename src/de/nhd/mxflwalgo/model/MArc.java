@@ -39,6 +39,12 @@ public class MArc extends Arc {
 		this.flow = flow;
 	}
 
+	/**
+	 * Reset all calculated stuffs
+	 */
+	public void reset() {
+		this.flow = 0;
+	}
 
 	@Override
 	public String toString() {

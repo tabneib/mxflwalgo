@@ -416,4 +416,24 @@ public class MVertex extends Point {
 				minHeight = Math.min(arc.getEndVertex().getHeight(), minHeight);
 		return minHeight;
 	}
+
+	/**
+	 * Reset all calculated stuffs
+	 */
+	public void reset() {
+		this.incidentLevelArcs = null;
+		this.searchPredecessorArcs = null;
+		this.currentResArcIdx = 0;
+		this.currentLevelArcIdx = null;
+		this.parent = null;
+		this.searchId = "";
+		this.distances = null;
+		this.levGraphIncluded = null;
+		this.dfsFinished = null;
+		this.dfsRemoved = null;
+		if (!this.isSource)
+			this.height = 0;
+		if (!this.isSource)
+			this.excess = 0;
+	}
 }

@@ -13,21 +13,22 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 
 	private boolean isInitialized = false;
 	private TreeSet<MVertex> activeVertices;
+	private static final Comparator<MVertex> comparator = new Comparator<MVertex>() {
+
+		@Override
+		public int compare(MVertex v1, MVertex v2) {
+			if (v1.equals(v2))
+				return 0;
+			if (v1.getHeight() >= v2.getHeight())
+				return 1;
+			else
+				return -1;
+		}
+	};
 
 	public GoldbergTarjan(MaxFlowProblem maxFlowProblem) {
 		super(maxFlowProblem);
-		this.activeVertices = new TreeSet<>(new Comparator<MVertex>() {
-
-			@Override
-			public int compare(MVertex v1, MVertex v2) {
-				if (v1.equals(v2))
-					return 0;
-				if (v1.getHeight() >= v2.getHeight())
-					return 1;
-				else
-					return -1;
-			}
-		});
+		this.activeVertices = new TreeSet<>(comparator);
 	}
 
 	@Override
@@ -118,6 +119,13 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		}
 		this.isInitialized = true;
 		return pushedArcs;
+	}
+
+	@Override
+	public void reset(){
+		super.reset();
+		this.isInitialized = false;
+		this.activeVertices = new TreeSet<>(comparator);
 	}
 
 }
