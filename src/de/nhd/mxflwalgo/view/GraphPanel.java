@@ -92,7 +92,7 @@ public class GraphPanel extends JPanel {
 	private static final Color NODE_UNDEREMPHASIZED_COLOR = Color.GRAY;
 	
 	private static final Color LINE_NORMAL_COLOR = Color.BLACK;
-	private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
+	//private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
 	private static final Color LINE_UNDEREMPHASIZED_COLOR = Color.GRAY;
 	
 	private static final Color TRANSPARENT_COLOR = new Color(0,0,0,1);
@@ -383,7 +383,7 @@ public class GraphPanel extends JPanel {
 
 			g.setStroke(new BasicStroke(1));
 			// Draw the line
-			if (maxFlowProblem.getGraph().highlightMode()) {
+			if (maxFlowProblem.getGraph().isInHighlightMode()) {
 				if (!(maxFlowProblem.getGraph().isHighlighted(this.arc))) {
 					if ((maxFlowProblem.getGraph().isHighlighted(this.arc.getTwinArc())))
 						g.setColor(TRANSPARENT_COLOR);
@@ -392,7 +392,7 @@ public class GraphPanel extends JPanel {
 				}
 				else{
 					g.setStroke(new BasicStroke(3));
-					g.setColor(LINE_HIGHLIGHTED_COLOR);
+					g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.arc));
 				}
 			}
 			else
@@ -446,11 +446,11 @@ public class GraphPanel extends JPanel {
 						(int) (y * scale - NODE_SIZE + OFF_Y), 2*NODE_SIZE, 2*NODE_SIZE);
 			}
 			else  {
-				if (maxFlowProblem.getGraph().highlightMode() &&
+				if (maxFlowProblem.getGraph().isInHighlightMode() &&
 						!(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
 					g.setColor(NODE_UNDEREMPHASIZED_COLOR);
 				else
-					g.setColor(NODE_HIGHLIGHTED_COLOR);
+					g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.vertex));
 				
 				g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),
 						(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE, NODE_SIZE);

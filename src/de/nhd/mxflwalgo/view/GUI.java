@@ -89,7 +89,6 @@ public class GUI extends JFrame {
 	private int vertexNumber = DEFAULT_VERTEX_NUMBER;
 	private int maxCapacity = DEFAULT_MAX_CAPACITY;
 
-	@Deprecated
 	private String algoName;
 	private MaxFlowAlgo algorithm;
 	private MaxFlowProblem problem;
@@ -121,12 +120,26 @@ public class GUI extends JFrame {
 		frame.setMinimumSize(new Dimension(
 				GRAPH_CONTAINER_WIDTH + SCROLL_VIEW_PADDING + MENU_CONTAINER_WIDTH,
 				WINDOW_HEIGHT));
+		this.initMaxFlowProblem();
+		
+		//this.revalidateAlgo();
 		addComponentsToPane(frame.getContentPane());
-
 		frame.pack();
 		frame.setVisible(true);
 	}
 
+	
+	private void initMaxFlowProblem() {
+		try {
+			this.mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
+					JOptionPane.INFORMATION_MESSAGE);
+			e.printStackTrace();
+		}
+		this.problem = new MaxFlowProblem((MGraph) this.mGraph);
+	}
+	
 	/**
 	 * Add components to the GUI window
 	 * 
@@ -174,24 +187,7 @@ public class GUI extends JFrame {
 
 		GraphPanel graphPanel;
 		// mGraph = getSampleGraph();
-		if (this.mGraph == null) {
-			try {
-				this.mGraph = GraphFactory.getBeautifulPlanarGraph(vertexNumber,
-						maxCapacity);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Invalid arguments!", "Error",
-						JOptionPane.INFORMATION_MESSAGE);
-				e.printStackTrace();
-			}
-			this.problem = new MaxFlowProblem(this.mGraph);
 
-			if (this.algorithm != null) {
-				buttonGroupAlgo.clearSelection();
-				buttonRun.setEnabled(false);
-				buttonRunStep.setEnabled(false);
-				this.algorithm = null;
-			}
-		}
 		graphPanel = new GraphPanel(this.problem);
 
 		// The whole grid panel is contained inside a scroll pane
@@ -361,10 +357,6 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
-
-						removeAlgoRunTask();
-						updateState(STATE_GRAPH_GENERATED);
-
 						try {
 							// Parse arguments
 							final String[] argStrs = textFieldParams.getText().split(" ");
@@ -381,7 +373,11 @@ public class GUI extends JFrame {
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
 
-						mGraph = null;
+						removeAlgoRunTask();
+						updateState(STATE_GRAPH_GENERATED);
+						initMaxFlowProblem();
+						algorithm = null;
+						
 						textFieldParams.setText(vertexNumber + " " + maxCapacity);
 
 						Component gContainer = frame.getContentPane().getComponent(0);
@@ -458,6 +454,8 @@ public class GUI extends JFrame {
 
 					@Override
 					public void run() {
+					
+						//revalidateAlgo();
 						algorithm.reset();
 						Component gContainer = frame.getContentPane().getComponent(0);
 						GridBagLayout layout = (GridBagLayout) frame.getContentPane()
@@ -481,20 +479,24 @@ public class GUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (radioFordFulkerson.isSelected()) {
+				mGraph.reset();
 				algoName = FORD_FULKERSON;
 				algorithm = new FordFulkerson(problem);
 				updateState(STATE_ALGO_SELECTED);
 			} else if (radioEdmondsKarp.isSelected()) {
+				mGraph.reset();
 				algoName = EDMONDS_KARP;
 				buttonRun.setEnabled(true);
 				buttonRunStep.setEnabled(true);
 				algorithm = new EdmondsKarp(problem);
 				updateState(STATE_ALGO_SELECTED);
 			} else if (radioDinic.isSelected()) {
+				mGraph.reset();
 				algoName = DINIC;
 				algorithm = new Dinic(problem);
 				updateState(STATE_ALGO_SELECTED);
 			} else if (radioGoldbergTarjan.isSelected()) {
+				mGraph.reset();
 				algoName = GOLDBERG_TARJAN;
 				algorithm = new GoldbergTarjan(problem);
 				updateState(STATE_ALGO_SELECTED);
@@ -579,6 +581,7 @@ public class GUI extends JFrame {
 				radioEdmondsKarp.setEnabled(true);
 				radioFordFulkerson.setEnabled(true);
 				radioGoldbergTarjan.setEnabled(true);
+				buttonGroupAlgo.clearSelection();
 				buttonRunStep.setEnabled(false);
 				buttonRun.setEnabled(false);
 				buttonReset.setEnabled(false);

@@ -8,7 +8,6 @@ public class MArc extends Arc {
 
 	private int capacity;
 	private int flow = 0;
-	public int length;
 	Direction direction = null;
 
 	/**

@@ -190,7 +190,7 @@ public class MVertex extends Point {
 	 *            the residual arc to be added
 	 * @return true if added, false if already existed
 	 */
-	public boolean addResIncidentArc(ResArc arc) {
+	public boolean addIncidentResArc(ResArc arc) {
 		if (this.incidentResArcs.contains(arc))
 			return false;
 		this.incidentResArcs.add(arc);
@@ -404,7 +404,7 @@ public class MVertex extends Point {
 	}
 
 	/**
-	 * Calculate thi minmal height among all vertices that are the end points of
+	 * Calculate the minimal height among all vertices that are the end points of
 	 * the incident residual arcs of this vertex
 	 * 
 	 * @return
@@ -421,6 +421,7 @@ public class MVertex extends Point {
 	 * Reset all calculated stuffs
 	 */
 	public void reset() {
+		this.incidentResArcs.clear();
 		this.incidentLevelArcs = null;
 		this.searchPredecessorArcs = null;
 		this.currentResArcIdx = 0;
@@ -436,4 +437,5 @@ public class MVertex extends Point {
 		if (!this.isSource)
 			this.excess = 0;
 	}
+
 }

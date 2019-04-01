@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import de.nhd.mxflwalgo.model.Arc;
+import de.nhd.mxflwalgo.model.MArc;
 import de.nhd.mxflwalgo.model.MGraph;
 import de.nhd.mxflwalgo.model.MVertex;
 import de.nhd.mxflwalgo.model.MaxFlowProblem;
@@ -66,6 +68,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 
 	@Override
 	public MGraph runStep() {
+		
 		if (!this.isInitialized) {
 			highlightArcs(this.initialize(), true);
 			return this.problem.getGraph();
@@ -85,6 +88,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 					this.activeVertices.add(currentArc.getEndVertex());
 				}
 				currentArc.pushFlow();
+				highlightNextArc(currentArc);
 				if (highestVertex.getExcess() == 0) {
 					this.activeVertices.remove(highestVertex);
 				}
@@ -96,8 +100,6 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		} else
 			this.finished = true;
 
-		this.problem.getGraph().clearAllHighlight();
-
 		// highlightAugPath(augPath, true);
 		// updateResGraph(augPath);
 		// updateGraph(augPath);
@@ -107,8 +109,8 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 	/**
 	 * Set up the induction basis for the algorithm
 	 */
-	private HashSet<ResArc> initialize() {
-		HashSet<ResArc> pushedArcs = new HashSet<>();
+	private HashSet<Arc> initialize() {
+		HashSet<Arc> pushedArcs = new HashSet<>();
 		this.problem.getSource().setHeight(this.problem.getGraph().getVertices().size());
 		for (ResArc arc : this.problem.getSource().getIncidentResArcs()) {
 			if (arc.getResValue() > 0) {

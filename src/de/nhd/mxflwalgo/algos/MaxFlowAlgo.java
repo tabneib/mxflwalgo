@@ -17,7 +17,7 @@ public abstract class MaxFlowAlgo {
 
 	public MaxFlowAlgo(MaxFlowProblem maxFlowProblem) {
 		this.problem = maxFlowProblem;
-		createResGraph();
+		this.createResGraph();
 	}
 
 	/**
@@ -51,21 +51,23 @@ public abstract class MaxFlowAlgo {
 		for (Arc arc : this.problem.getGraph().getArcs()) {
 			MArc mArc = (MArc) arc;
 
-			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(), mArc.getCapacity() - mArc.getFlow(),
-					null, arc, true);
+			ResArc forward = new ResArc(mArc.getStartVertex(), mArc.getEndVertex(),
+					mArc.getCapacity() - mArc.getFlow(), null, arc, true);
 
-			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(), mArc.getFlow(), forward, arc,
-					false);
+			ResArc backward = new ResArc(mArc.getEndVertex(), mArc.getStartVertex(),
+					mArc.getFlow(), forward, arc, false);
 
 			forward.setBackwardResArc(backward);
 			arcs.add(forward);
 			arcs.add(backward);
-			mArc.getStartVertex().addResIncidentArc(forward);
-			mArc.getEndVertex().addResIncidentArc(backward);
+			mArc.getStartVertex().addIncidentResArc(forward);
+			mArc.getEndVertex().addIncidentResArc(backward);
 		}
 		this.resGraph = new MGraph(this.problem.getGraph().getVertices(), arcs);
-		System.out.println("[Max-Flow Algorithm] Residual Graph initialized. (|V|,|A|) = ("
-				+ this.resGraph.getVertices().size() + ", " + this.resGraph.getArcs().size() + ")");
+		System.out
+				.println("[Max-Flow Algorithm] Residual Graph created: (|V|,|A|) = ("
+						+ this.resGraph.getVertices().size() + ", "
+						+ this.resGraph.getArcs().size() + ")");
 	}
 
 	/**
@@ -78,7 +80,7 @@ public abstract class MaxFlowAlgo {
 		for (ResArc arc : augPath.arcs)
 			arc.addFlow(augPath.value);
 	}
-	
+
 	public MGraph getResGraph() {
 		return this.resGraph;
 	}
@@ -88,25 +90,44 @@ public abstract class MaxFlowAlgo {
 	 * highlight is also cleared optionally.
 	 * 
 	 * @param path
-	 * @param clear	
+	 * @param clear
 	 */
 	protected void highlightAugPath(AugmentingPath path, boolean clear) {
-		this.highlightArcs(path.arcs, clear);
+		this.highlightArcs(new ArrayList<Arc>(path.arcs), clear);
 	}
-	
+
 	/**
 	 * Highlight all original arcs of the given residual arcs
+	 * 
 	 * @param arcs
 	 * @param clear
 	 */
-	protected void highlightArcs(Collection<ResArc> arcs, boolean clear) {
+	protected void highlightArcs(Collection<Arc> arcs, boolean clear) {
 		if (clear)
 			this.problem.getGraph().clearAllHighlight();
-		for (ResArc rArc : arcs) {
-			this.problem.getGraph().highlightArc(rArc.getOriginalArc());
-			this.problem.getGraph().hightlightVertex(rArc.getStartVertex());
-			this.problem.getGraph().hightlightVertex(rArc.getEndVertex());
+		for (Arc rArc : arcs) {
+			this.problem.getGraph().highlightArc(((ResArc) rArc).getOriginalArc(), null);
+			this.problem.getGraph().hightlightVertex(rArc.getStartVertex(), null);
+			this.problem.getGraph().hightlightVertex(rArc.getEndVertex(), null);
 		}
+	}
+
+	/**
+	 * Highlight the given arc with different color but still highlight all
+	 * already highlighted arcs with default highlight color
+	 * 
+	 * @param arc
+	 */
+	protected void highlightNextArc(ResArc arc) {
+
+		this.highlightArcs(
+				new ArrayList<>(problem.getGraph().getHightlightedArcs().keySet()),
+				false);
+
+		this.problem.getGraph().highlightArc(arc.getOriginalArc(), null);
+		this.problem.getGraph().hightlightVertex(arc.getStartVertex(), null);
+		this.problem.getGraph().hightlightVertex(arc.getEndVertex(), null);
+
 	}
 
 	/**
@@ -133,13 +154,13 @@ public abstract class MaxFlowAlgo {
 			return str.substring(0, str.length() - 2);
 		}
 	}
-	
+
 	/**
 	 * Reset all calculated stuffs
 	 */
-	public void reset() {
-		this.resGraph.reset();
-		this.problem.getGraph().reset();
+	public void reset() {	
 		this.finished = false;
+		this.problem.getGraph().reset();
+		this.createResGraph();	
 	}
 }

@@ -48,7 +48,8 @@ public class FordFulkerson extends MaxFlowAlgo {
 	private AugmentingPath dfs() {
 		String searchId = UUID.randomUUID().toString();
 		this.problem.getSource().setSeen(searchId);
-		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(), Integer.MAX_VALUE, searchId);
+		return recDfs(this.resGraph.getVertices().get(0), new ArrayList<ResArc>(),
+				Integer.MAX_VALUE, searchId);
 	}
 
 	/**
@@ -63,12 +64,14 @@ public class FordFulkerson extends MaxFlowAlgo {
 	 *            Id of the current DFS
 	 * @return
 	 */
-	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath, int augmentingValue,
-			String searchId) {
+	private AugmentingPath recDfs(MVertex currentNode, ArrayList<ResArc> currentPath,
+			int augmentingValue, String searchId) {
 		for (ResArc arc : currentNode.getIncidentResArcs()) {
-			if (arc.getResValue() > 0 && arc.getEndVertex().equals(this.problem.getTarget())) {
+			if (arc.getResValue() > 0
+					&& arc.getEndVertex().equals(this.problem.getTarget())) {
 				currentPath.add(arc);
-				return new AugmentingPath(currentPath, Math.min(augmentingValue, arc.getResValue()));
+				return new AugmentingPath(currentPath,
+						Math.min(augmentingValue, arc.getResValue()));
 			} else if (arc.getResValue() > 0 && !arc.getEndVertex().isSeen(searchId)) {
 				arc.getEndVertex().setSeen(searchId);
 				currentPath.add(arc);
