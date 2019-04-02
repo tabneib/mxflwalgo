@@ -15,6 +15,7 @@ public class MGraph extends Graph {
 	private static final Color DEFAULT_HIGHLIGHTED_ARC_COLOR = Color.black;
 
 	private HashMap<MVertex, Color> hightlightedVertices;
+
 	private HashMap<Arc, Color> hightlightedArcs;
 
 	public MGraph(ArrayList<MVertex> vertices, ArrayList<Arc> arcs) {
@@ -63,6 +64,10 @@ public class MGraph extends Graph {
 
 	public HashMap<Arc, Color> getHightlightedArcs() {
 		return hightlightedArcs;
+	}
+	
+	public HashMap<MVertex, Color> getHightlightedVertices() {
+		return hightlightedVertices;
 	}
 
 	/**

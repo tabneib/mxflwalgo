@@ -60,16 +60,15 @@ public class GraphPanel extends JPanel {
 	 * Width of the label of an arc in the graph
 	 */
 	private static final int LABEL_WIDTH = 25;
-	
+
 	/**
 	 * Offset from the label to the arc
 	 */
 	private static final int LABEL_OFFSET = 7;
-	
+
 	/**
-	 * Threshold that defines small scales.
-	 * For small scales no arc label is drawn.
-	 * 0.71 = from 56 vertices
+	 * Threshold that defines small scales. For small scales no arc label is
+	 * drawn. 0.71 = from 56 vertices
 	 */
 	private static final double SMALL_SCALE = 0.71;
 
@@ -90,23 +89,25 @@ public class GraphPanel extends JPanel {
 
 	private static final Color NODE_HIGHLIGHTED_COLOR = Color.RED;
 	private static final Color NODE_UNDEREMPHASIZED_COLOR = Color.GRAY;
-	
+
 	private static final Color LINE_NORMAL_COLOR = Color.BLACK;
-	//private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
+	// private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
 	private static final Color LINE_UNDEREMPHASIZED_COLOR = Color.GRAY;
-	
-	private static final Color TRANSPARENT_COLOR = new Color(0,0,0,1);
-	
+
+	private static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 1);
+
 	private final MaxFlowProblem maxFlowProblem;
 
+	private final String algoName;
 	/**
 	 * Creates a new JGraphPanel for the given max flow problem
 	 * 
 	 * @param arcs
 	 *            list of arcs
 	 */
-	public GraphPanel(MaxFlowProblem problem) {
+	public GraphPanel(MaxFlowProblem problem, String algoName) {
 		this.maxFlowProblem = problem;
+		this.algoName = algoName;
 		this.arcs = this.maxFlowProblem.getGraph().getArcs();
 		this.vertices = this.maxFlowProblem.getGraph().getVertices();
 		this.scaleUpdated = false;
@@ -152,7 +153,7 @@ public class GraphPanel extends JPanel {
 
 		for (MVertex vertex : this.vertices)
 			this.drawVertex(g2d, vertex);
-		
+
 		if (this.scale > SMALL_SCALE && !labelInserted)
 			this.insertLabels();
 	}
@@ -183,8 +184,8 @@ public class GraphPanel extends JPanel {
 
 	/**
 	 * Draw an arrow head with the given coordinates of the corresponding line
-	 * and color. If the given graphics and color are null, so do not draw anything but 
-	 * just calculate the position of the arrow head.
+	 * and color. If the given graphics and color are null, so do not draw
+	 * anything but just calculate the position of the arrow head.
 	 * 
 	 * @param g
 	 * @param color
@@ -216,18 +217,18 @@ public class GraphPanel extends JPanel {
 		double angle = Math.atan2(dy, dx);
 		AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
 		at.concatenate(AffineTransform.getRotateInstance(angle));
-		
+
 		if (g != null && color != null) {
 			Graphics2D g2D = (Graphics2D) g.create();
 			g2D.setColor(color);
 			g2D.transform(at);
 
 			g2D.fillPolygon(
-					new int[] { (int) len, (int) len - ARROW_HEAD_SIZE,
-							(int) len - ARROW_HEAD_SIZE, (int) len },
-					new int[] { 0, -ARROW_HEAD_SIZE / 2, ARROW_HEAD_SIZE / 2, 0 }, 4);
+					new int[]{(int) len, (int) len - ARROW_HEAD_SIZE,
+							(int) len - ARROW_HEAD_SIZE, (int) len},
+					new int[]{0, -ARROW_HEAD_SIZE / 2, ARROW_HEAD_SIZE / 2, 0}, 4);
 		}
-			
+
 		return new Point(x2, y2);
 	}
 
@@ -252,25 +253,31 @@ public class GraphPanel extends JPanel {
 			maxY = Math.max(item.getEndVertex().y, maxY);
 		}
 
-		double scaleX = (this.getWidth() - OFF_X - 10) / (maxX + LABEL_WIDTH + LABEL_OFFSET);
+		double scaleX = (this.getWidth() - OFF_X - 10)
+				/ (maxX + LABEL_WIDTH + LABEL_OFFSET);
 		double scaleY = (this.getHeight() - OFF_Y - 10) / maxY;
 
 		this.scale = Math.min(scaleX, scaleY);
-		//System.out.println("[GraphPanel] scale = " + this.scale);
+		// System.out.println("[GraphPanel] scale = " + this.scale);
 		scaleUpdated = true;
 	}
 
 	/**
-	 * Insert labels for the arcs of the graph.
-	 * We don't do this in paintComponent to prevent infinite loop due to repainting.
+	 * Insert labels for the arcs of the graph. We don't do this in
+	 * paintComponent to prevent infinite loop due to repainting.
 	 */
 	public void insertLabels() {
-		if (!labelInserted) 
+		if (!labelInserted) {
 			for (Line line : this.lines)
 				add(line.getLabel());
+			for (Node node : this.nodes)
+				if (node.getLabel() != null)
+					add(node.getLabel());
+		}
 		labelInserted = true;
+
 	}
-	
+
 	/**
 	 * Internal class representing a line in the to be drawn graph
 	 *
@@ -290,7 +297,7 @@ public class GraphPanel extends JPanel {
 			this.x2 = x2;
 			this.y2 = y2;
 		}
-		
+
 		/**
 		 * Generate the label of this arc
 		 */
@@ -300,7 +307,7 @@ public class GraphPanel extends JPanel {
 				this.label = new JLabel(
 						((MArc) arc).getFlow() + "|" + ((MArc) arc).getCapacity());
 			// else: TODO
-			
+
 			// Get the position of the arrow head
 			Point arrowHeadPos = drawdArrowHead(null, null, (int) (x1 * scale + OFF_X),
 					(int) (y1 * scale + OFF_Y), (int) (x2 * scale + OFF_X),
@@ -309,10 +316,10 @@ public class GraphPanel extends JPanel {
 			// No label if small scale
 			if (scale <= SMALL_SCALE)
 				this.label = null;
-			
+
 			// Scale is OK, add the label
 			label.setSize(LABEL_WIDTH, LABEL_HEIGHT);
-			
+
 			Font labelFont = label.getFont();
 			String labelText = label.getText();
 
@@ -320,56 +327,61 @@ public class GraphPanel extends JPanel {
 			int componentWidth = label.getWidth();
 
 			// Find out how much the font can grow in width.
-			double widthRatio = (double)componentWidth / (double)stringWidth;
+			double widthRatio = (double) componentWidth / (double) stringWidth;
 
-			int newFontSize = (int)(labelFont.getSize() * widthRatio);
+			int newFontSize = (int) (labelFont.getSize() * widthRatio);
 			int componentHeight = label.getHeight();
 
-			// Pick a new font size so it will not be larger than the height of label.
+			// Pick a new font size so it will not be larger than the height of
+			// label.
 			int fontSizeToUse = Math.min(newFontSize, componentHeight);
 
 			// Set the label's font size to the newly determined size.
 			label.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
-			
+
 			switch (this.arc.getDirection()) {
-			case HORIZONTAL_TO_RIGHT:
-				label.setLocation((int) (arrowHeadPos.x - 2 * ARROW_HEAD_SIZE), 
-						arrowHeadPos.y - LABEL_HEIGHT - LABEL_OFFSET);
-				break;
+				case HORIZONTAL_TO_RIGHT :
+					label.setLocation((int) (arrowHeadPos.x - 2 * ARROW_HEAD_SIZE),
+							arrowHeadPos.y - LABEL_HEIGHT - LABEL_OFFSET);
+					break;
 
-			case HORIZONTAL_TO_LEFT:
-				label.setLocation((int) (arrowHeadPos.x - ARROW_HEAD_SIZE), 
-						arrowHeadPos.y - LABEL_HEIGHT - LABEL_OFFSET);
-				break;
+				case HORIZONTAL_TO_LEFT :
+					label.setLocation((int) (arrowHeadPos.x - ARROW_HEAD_SIZE),
+							arrowHeadPos.y - LABEL_HEIGHT - LABEL_OFFSET);
+					break;
 
-			case VERTICAL_UP:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET), 
-						arrowHeadPos.y);
-				break;
-				
-			case VERTICAL_DOWN:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET), 
-						(int) (arrowHeadPos.y - 1.2 * ARROW_HEAD_SIZE));
-				break;
+				case VERTICAL_UP :
+					label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET),
+							arrowHeadPos.y);
+					break;
 
-			case DIAGONAL_TO_BOTTOMRIGHT:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET - ARROW_HEAD_SIZE * 0.5), 
-						arrowHeadPos.y - ARROW_HEAD_SIZE);
-				break;
-			case DIAGONAL_TO_BOTTOMLEFT:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET + ARROW_HEAD_SIZE), 
-						(int) (arrowHeadPos.y - ARROW_HEAD_SIZE));
-				break;
-			case DIAGONAL_TO_TOPRIGHT:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET - 0.5 * ARROW_HEAD_SIZE), 
-						arrowHeadPos.y);
-				break;
-			case DIAGONAL_TO_TOPLEFT:
-				label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET + ARROW_HEAD_SIZE), 
-						(int) (arrowHeadPos.y - 0.3 * ARROW_HEAD_SIZE));
-				break;
-			default:
-				throw new RuntimeException("Unkown arc direction!");
+				case VERTICAL_DOWN :
+					label.setLocation((int) (arrowHeadPos.x + LABEL_OFFSET),
+							(int) (arrowHeadPos.y - 1.2 * ARROW_HEAD_SIZE));
+					break;
+
+				case DIAGONAL_TO_BOTTOMRIGHT :
+					label.setLocation(
+							(int) (arrowHeadPos.x + LABEL_OFFSET - ARROW_HEAD_SIZE * 0.5),
+							arrowHeadPos.y - ARROW_HEAD_SIZE);
+					break;
+				case DIAGONAL_TO_BOTTOMLEFT :
+					label.setLocation(
+							(int) (arrowHeadPos.x + LABEL_OFFSET + ARROW_HEAD_SIZE),
+							(int) (arrowHeadPos.y - ARROW_HEAD_SIZE));
+					break;
+				case DIAGONAL_TO_TOPRIGHT :
+					label.setLocation(
+							(int) (arrowHeadPos.x + LABEL_OFFSET - 0.5 * ARROW_HEAD_SIZE),
+							arrowHeadPos.y);
+					break;
+				case DIAGONAL_TO_TOPLEFT :
+					label.setLocation(
+							(int) (arrowHeadPos.x + LABEL_OFFSET + ARROW_HEAD_SIZE),
+							(int) (arrowHeadPos.y - 0.3 * ARROW_HEAD_SIZE));
+					break;
+				default :
+					throw new RuntimeException("Unkown arc direction!");
 			}
 		}
 
@@ -389,13 +401,15 @@ public class GraphPanel extends JPanel {
 						g.setColor(TRANSPARENT_COLOR);
 					else
 						g.setColor(LINE_UNDEREMPHASIZED_COLOR);
-				}
-				else{
+				} else {
 					g.setStroke(new BasicStroke(3));
-					g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.arc));
+					if ((maxFlowProblem.getGraph().isHighlighted(this.arc.getTwinArc()))
+							&& this.arc.getTwinArc().getzIndex() > this.arc.getzIndex())
+						g.setColor(TRANSPARENT_COLOR);
+					else
+						g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.arc));
 				}
-			}
-			else
+			} else
 				g.setColor(LINE_NORMAL_COLOR);
 
 			g.drawLine((int) (x1 * scale + OFF_X), (int) (y1 * scale + OFF_Y),
@@ -407,7 +421,7 @@ public class GraphPanel extends JPanel {
 					(int) (y2 * scale + OFF_Y));
 
 		}
-		
+
 		public JLabel getLabel() {
 			if (this.label == null)
 				// Create the label
@@ -424,6 +438,7 @@ public class GraphPanel extends JPanel {
 		final MVertex vertex;
 		final int x;
 		final int y;
+		private JLabel label;
 
 		public Node(MVertex vertex, int x, int y) {
 			this.vertex = vertex;
@@ -439,22 +454,63 @@ public class GraphPanel extends JPanel {
 		public void draw(final Graphics2D g) {
 
 			// Draw the points
-			if (this.vertex.equals(maxFlowProblem.getSource()) ||
-					this.vertex.equals(maxFlowProblem.getTarget())) {
+			if (this.vertex.equals(maxFlowProblem.getSource())
+					|| this.vertex.equals(maxFlowProblem.getTarget())) {
 				g.setColor(NODE_HIGHLIGHTED_COLOR);
-				g.fillOval((int) (x * scale - NODE_SIZE + OFF_X),
-						(int) (y * scale - NODE_SIZE + OFF_Y), 2*NODE_SIZE, 2*NODE_SIZE);
+
+				int nodeScale = scale <= SMALL_SCALE || algoName == null
+						|| !algoName.equals(GUI.GOLDBERG_TARJAN) ? 1 : 4;
+
+				g.fillOval((int) (x * scale - nodeScale * NODE_SIZE/2 + OFF_X),
+						(int) (y * scale - nodeScale * NODE_SIZE/2 + OFF_Y),
+						nodeScale * NODE_SIZE, nodeScale * NODE_SIZE);
+			} else {
+				if (algoName == null || !algoName.equals(GUI.GOLDBERG_TARJAN)) {
+					if (maxFlowProblem.getGraph().isInHighlightMode()
+							&& !(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
+						g.setColor(NODE_UNDEREMPHASIZED_COLOR);
+					else
+						g.setColor(
+								maxFlowProblem.getGraph().getHighlightColor(this.vertex));
+					g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),
+							(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE,
+							NODE_SIZE);
+				} else {
+					if (!maxFlowProblem.getGraph().isInHighlightMode()
+							|| !(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
+						g.setColor(NODE_UNDEREMPHASIZED_COLOR.brighter());
+
+					else if (maxFlowProblem.getGraph().isInHighlightMode()) {
+						if (scale <= SMALL_SCALE)
+							g.setColor(NODE_HIGHLIGHTED_COLOR);
+						else
+							g.setColor(maxFlowProblem.getGraph()
+									.getHighlightColor(this.vertex).brighter());
+					}
+					int nodeScale = scale <= SMALL_SCALE ? 1 : 4;
+					g.fillOval((int) (x * scale - nodeScale * NODE_SIZE / 2 + OFF_X),
+							(int) (y * scale - nodeScale * NODE_SIZE / 2 + OFF_Y),
+							nodeScale * NODE_SIZE, nodeScale * NODE_SIZE);
+				}
 			}
-			else  {
-				if (maxFlowProblem.getGraph().isInHighlightMode() &&
-						!(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
-					g.setColor(NODE_UNDEREMPHASIZED_COLOR);
+		}
+
+		public JLabel getLabel() {
+			// Create the label for height, used in Goldberg-Tarjan
+			if (scale > SMALL_SCALE && this.label == null && algoName != null
+					&& algoName.equals(GUI.GOLDBERG_TARJAN)) {
+				this.label = new JLabel("" + this.vertex.getHeight());
+				if (this.label.getText().length() >= 2)
+					this.label.setLocation(
+							(int) (x * scale - 2.5 * NODE_SIZE / 2 + OFF_X),
+							(int) (y * scale - 2 * NODE_SIZE / 2 + OFF_Y));
 				else
-					g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.vertex));
-				
-				g.fillOval((int) (x * scale - NODE_SIZE / 2 + OFF_X),
-						(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE, NODE_SIZE);
+					this.label.setLocation(
+							(int) (x * scale - 1.5 * NODE_SIZE / 2 + OFF_X),
+							(int) (y * scale - 2 * NODE_SIZE / 2 + OFF_Y));
+				label.setSize(LABEL_WIDTH, LABEL_HEIGHT);
 			}
+			return this.label;
 		}
 	}
 }

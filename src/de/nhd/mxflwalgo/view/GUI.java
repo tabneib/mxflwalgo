@@ -47,10 +47,10 @@ public class GUI extends JFrame {
 	public static final int SCROLL_VIEW_PADDING = 20;
 	public static final int DEFAULT_DELAY = 500;
 
-	private static final String FORD_FULKERSON = "FORD_FULKERSON";
-	private static final String EDMONDS_KARP = "EDMONDS_KARP";
-	private static final String DINIC = "DINIC";
-	private static final String GOLDBERG_TARJAN = "GOLDBERG_TARJAN";
+	protected static final String FORD_FULKERSON = "FORD_FULKERSON";
+	protected static final String EDMONDS_KARP = "EDMONDS_KARP";
+	protected static final String DINIC = "DINIC";
+	protected static final String GOLDBERG_TARJAN = "GOLDBERG_TARJAN";
 
 	// GUI States
 	private static final String STATE_GRAPH_GENERATED = "STATE_GRAPH_GENERATED";
@@ -188,7 +188,7 @@ public class GUI extends JFrame {
 		GraphPanel graphPanel;
 		// mGraph = getSampleGraph();
 
-		graphPanel = new GraphPanel(this.problem);
+		graphPanel = new GraphPanel(this.problem, this.algoName);
 
 		// The whole grid panel is contained inside a scroll pane
 		JScrollPane scrollPane = new JScrollPane(graphPanel);

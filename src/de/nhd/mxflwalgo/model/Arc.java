@@ -18,6 +18,8 @@ public abstract class Arc implements Comparable<Arc>{
 	 */
 	private Arc twinArc;
 	
+	private int zIndex = 0;
+	
 	protected MVertex startVertex;
 	protected MVertex endVertex;
 	public int length;
@@ -126,6 +128,14 @@ public abstract class Arc implements Comparable<Arc>{
 	}
 	
 	public abstract void reset();
+
+	public int getzIndex() {
+		return zIndex;
+	}
+
+	public void setzIndex(int zIndex) {
+		this.zIndex = zIndex;
+	}
 
 	/**
 	 * Possible directions of the arcs

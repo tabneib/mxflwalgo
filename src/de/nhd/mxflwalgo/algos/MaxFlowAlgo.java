@@ -113,24 +113,6 @@ public abstract class MaxFlowAlgo {
 	}
 
 	/**
-	 * Highlight the given arc with different color but still highlight all
-	 * already highlighted arcs with default highlight color
-	 * 
-	 * @param arc
-	 */
-	protected void highlightNextArc(ResArc arc) {
-
-		this.highlightArcs(
-				new ArrayList<>(problem.getGraph().getHightlightedArcs().keySet()),
-				false);
-
-		this.problem.getGraph().highlightArc(arc.getOriginalArc(), null);
-		this.problem.getGraph().hightlightVertex(arc.getStartVertex(), null);
-		this.problem.getGraph().hightlightVertex(arc.getEndVertex(), null);
-
-	}
-
-	/**
 	 * Inner class that represents a flow augmenting path
 	 *
 	 */

@@ -1,7 +1,10 @@
 package de.nhd.mxflwalgo.algos;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import de.nhd.mxflwalgo.model.Arc;
@@ -68,7 +71,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 
 	@Override
 	public MGraph runStep() {
-		
+
 		if (!this.isInitialized) {
 			highlightArcs(this.initialize(), true);
 			return this.problem.getGraph();
@@ -88,7 +91,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 					this.activeVertices.add(currentArc.getEndVertex());
 				}
 				currentArc.pushFlow();
-				highlightNextArc(currentArc);
+				highlightPushingArc(currentArc);
 				if (highestVertex.getExcess() == 0) {
 					this.activeVertices.remove(highestVertex);
 				}
@@ -96,13 +99,10 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 				// Relabel
 				highestVertex.setHeight(highestVertex.getMinIncidentResArcHeight() + 1);
 				highestVertex.resetCurrentResArc();
+				highlightRelabelingVertex(highestVertex);
 			}
 		} else
 			this.finished = true;
-
-		// highlightAugPath(augPath, true);
-		// updateResGraph(augPath);
-		// updateGraph(augPath);
 		return this.problem.getGraph();
 	}
 
@@ -123,8 +123,47 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		return pushedArcs;
 	}
 
+	/**
+	 * Highlight the given arc with different color but still highlight all
+	 * already highlighted arcs with default highlight color
+	 * 
+	 * @param resArc
+	 */
+	protected void highlightPushingArc(ResArc resArc) {
+
+		Iterator<Arc> iterator = problem.getGraph().getHightlightedArcs().keySet()
+				.iterator();
+		while (iterator.hasNext()) {
+			Arc arc = iterator.next();
+			if (((MArc) arc).getFlow() <= 0) {
+				iterator.remove();
+				problem.getGraph().getHightlightedVertices().remove(arc.getStartVertex());
+				problem.getGraph().getHightlightedVertices().remove(arc.getEndVertex());
+			} else {
+				this.problem.getGraph().highlightArc(arc, null);
+				this.problem.getGraph().hightlightVertex(arc.getStartVertex(),
+						new Color(188, 103, 103));
+				this.problem.getGraph().hightlightVertex(arc.getEndVertex(),
+						new Color(188, 103, 103));
+			}
+			arc.setzIndex(0);
+		}
+
+		this.problem.getGraph().highlightArc(resArc.getOriginalArc(),
+				new Color(13, 165, 46));
+		this.problem.getGraph().hightlightVertex(resArc.getStartVertex(),
+				new Color(83, 178, 105));
+		this.problem.getGraph().hightlightVertex(resArc.getEndVertex(),
+				new Color(83, 178, 105));
+		resArc.getOriginalArc().setzIndex(100);
+	}
+	
+	private void highlightRelabelingVertex(MVertex vertex) {
+		this.problem.getGraph().hightlightVertex(vertex, new Color(255, 231, 22));
+	}
+
 	@Override
-	public void reset(){
+	public void reset() {
 		super.reset();
 		this.isInitialized = false;
 		this.activeVertices = new TreeSet<>(comparator);
