@@ -100,6 +100,6 @@ public class ResArc extends Arc {
 	 */
 	public void reset() {
 		this.resValue = this.isForward ? ((MArc) originalArc).getCapacity() : 0;
-		
+
 	}
 }

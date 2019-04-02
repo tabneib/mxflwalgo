@@ -258,7 +258,6 @@ public class GraphPanel extends JPanel {
 		double scaleY = (this.getHeight() - OFF_Y - 10) / maxY;
 
 		this.scale = Math.min(scaleX, scaleY);
-		// System.out.println("[GraphPanel] scale = " + this.scale);
 		scaleUpdated = true;
 	}
 
@@ -461,8 +460,8 @@ public class GraphPanel extends JPanel {
 				int nodeScale = scale <= SMALL_SCALE || algoName == null
 						|| !algoName.equals(GUI.GOLDBERG_TARJAN) ? 1 : 4;
 
-				g.fillOval((int) (x * scale - nodeScale * NODE_SIZE/2 + OFF_X),
-						(int) (y * scale - nodeScale * NODE_SIZE/2 + OFF_Y),
+				g.fillOval((int) (x * scale - nodeScale * NODE_SIZE / 2 + OFF_X),
+						(int) (y * scale - nodeScale * NODE_SIZE / 2 + OFF_Y),
 						nodeScale * NODE_SIZE, nodeScale * NODE_SIZE);
 			} else {
 				if (algoName == null || !algoName.equals(GUI.GOLDBERG_TARJAN)) {
@@ -476,6 +475,16 @@ public class GraphPanel extends JPanel {
 							(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE,
 							NODE_SIZE);
 				} else {
+					
+					if (this.vertex.getExcess() > 0) {
+						// Draw a border around the node if it is having excess
+						g.setColor(NODE_HIGHLIGHTED_COLOR.brighter());
+						int nodeScale = scale <= SMALL_SCALE ? 2 : 6;
+						g.fillOval((int) (x * scale - nodeScale * NODE_SIZE / 2 + OFF_X),
+								(int) (y * scale - nodeScale * NODE_SIZE / 2 + OFF_Y),
+								(int) nodeScale * NODE_SIZE, (int) nodeScale * NODE_SIZE);
+					}
+					
 					if (!maxFlowProblem.getGraph().isInHighlightMode()
 							|| !(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
 						g.setColor(NODE_UNDEREMPHASIZED_COLOR.brighter());

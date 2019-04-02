@@ -1,6 +1,5 @@
 package de.nhd.mxflwalgo.view;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -23,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import de.nhd.mxflwalgo.algos.Dinic;

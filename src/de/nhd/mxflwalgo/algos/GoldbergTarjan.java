@@ -1,7 +1,6 @@
 package de.nhd.mxflwalgo.algos;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,9 +23,14 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		public int compare(MVertex v1, MVertex v2) {
 			if (v1.equals(v2))
 				return 0;
-			if (v1.getHeight() >= v2.getHeight())
+			if (v1.getHeight() > v2.getHeight())
 				return 1;
-			else
+			else if (v1.getHeight() == v2.getHeight()) {
+				if (v1.hashCode() > v2.hashCode())
+					return 1;
+				else
+					return -1;
+			} else
 				return -1;
 		}
 	};
@@ -87,19 +91,24 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 				// Push
 				if (!currentArc.getEndVertex().equals(this.problem.getSource())
 						&& !currentArc.getEndVertex().equals(this.problem.getTarget())
-						&& currentArc.getEndVertex().getExcess() == 0) {
+						&& currentArc.getEndVertex().getExcess() == 0) 
 					this.activeVertices.add(currentArc.getEndVertex());
-				}
+				
 				currentArc.pushFlow();
 				highlightPushingArc(currentArc);
-				if (highestVertex.getExcess() == 0) {
+				
+				if (highestVertex.getExcess() == 0) 
 					this.activeVertices.remove(highestVertex);
-				}
 			} else {
 				// Relabel
+				// Bug fixed: we have to remove and re-add the vertex since its
+				// height attribute is modified and the comparator depends on
+				// height
+				this.activeVertices.remove(highestVertex);
 				highestVertex.setHeight(highestVertex.getMinIncidentResArcHeight() + 1);
 				highestVertex.resetCurrentResArc();
 				highlightRelabelingVertex(highestVertex);
+				this.activeVertices.add(highestVertex);
 			}
 		} else
 			this.finished = true;
@@ -157,7 +166,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 				new Color(83, 178, 105));
 		resArc.getOriginalArc().setzIndex(100);
 	}
-	
+
 	private void highlightRelabelingVertex(MVertex vertex) {
 		this.problem.getGraph().hightlightVertex(vertex, new Color(255, 231, 22));
 	}
