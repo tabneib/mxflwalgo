@@ -93,6 +93,7 @@ public class GraphPanel extends JPanel {
 	private static final Color LINE_NORMAL_COLOR = Color.BLACK;
 	// private static final Color LINE_HIGHLIGHTED_COLOR = Color.BLACK;
 	private static final Color LINE_UNDEREMPHASIZED_COLOR = Color.GRAY;
+	private static final Color LINE_SATURATED_COLOR = Color.RED;
 
 	private static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 1);
 
@@ -403,10 +404,17 @@ public class GraphPanel extends JPanel {
 				} else {
 					g.setStroke(new BasicStroke(3));
 					if ((maxFlowProblem.getGraph().isHighlighted(this.arc.getTwinArc()))
-							&& this.arc.getTwinArc().getzIndex() > this.arc.getzIndex())
+							&& this.arc.getTwinArc().getzIndex() > this.arc.getzIndex()) {
 						g.setColor(TRANSPARENT_COLOR);
-					else
-						g.setColor(maxFlowProblem.getGraph().getHighlightColor(this.arc));
+					} else 
+						if (algoName.equals(GUI.GOLDBERG_TARJAN) && ((MArc) this.arc)
+								.getFlow() == ((MArc) this.arc).getCapacity()){
+							g.setColor(LINE_SATURATED_COLOR);
+						}
+						else {
+							g.setColor(maxFlowProblem.getGraph()
+									.getHighlightColor(this.arc));
+					}
 				}
 			} else
 				g.setColor(LINE_NORMAL_COLOR);
@@ -475,7 +483,7 @@ public class GraphPanel extends JPanel {
 							(int) (y * scale - NODE_SIZE / 2 + OFF_Y), NODE_SIZE,
 							NODE_SIZE);
 				} else {
-					
+
 					if (this.vertex.getExcess() > 0) {
 						// Draw a border around the node if it is having excess
 						g.setColor(NODE_HIGHLIGHTED_COLOR.brighter());
@@ -484,7 +492,7 @@ public class GraphPanel extends JPanel {
 								(int) (y * scale - nodeScale * NODE_SIZE / 2 + OFF_Y),
 								(int) nodeScale * NODE_SIZE, (int) nodeScale * NODE_SIZE);
 					}
-					
+
 					if (!maxFlowProblem.getGraph().isInHighlightMode()
 							|| !(maxFlowProblem.getGraph().isHighlighted(this.vertex)))
 						g.setColor(NODE_UNDEREMPHASIZED_COLOR.brighter());
