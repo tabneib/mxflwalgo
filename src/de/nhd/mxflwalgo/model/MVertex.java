@@ -14,6 +14,11 @@ public class MVertex extends Point {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * List of arcs in the graph that have this vertex as endpoint
+	 */
+	private ArrayList<MArc> inArcs;
+	
+	/**
 	 * List of arcs in the graph that have this vertex as startpoint
 	 */
 	private ArrayList<MArc> incidentArcs;
@@ -105,6 +110,7 @@ public class MVertex extends Point {
 	 */
 	public MVertex(int x, int y) {
 		super(x, y);
+		this.inArcs = new ArrayList<>();
 		this.incidentArcs = new ArrayList<>();
 		this.incidentResArcs = new ArrayList<>();
 	}
@@ -415,6 +421,17 @@ public class MVertex extends Point {
 			if (arc.getResValue() > 0)
 				minHeight = Math.min(arc.getEndVertex().getHeight(), minHeight);
 		return minHeight;
+	}
+	
+	public ArrayList<MArc> getInArcs() {
+		return inArcs;
+	}
+
+	public boolean addInArc(MArc arc) {
+		if (this.inArcs.contains(arc))
+			return false;
+		this.inArcs.add(arc);
+		return true;
 	}
 
 	/**

@@ -12,18 +12,20 @@ public class GraphFactory {
 	 * Maximal x- and y-coordinate of the nodes
 	 */
 	private static final int MAX_COORDINATE = 1000;
-	
+
 	@Deprecated
 	private static final int MIN_COORDINATE = 0;
 	@Deprecated
 	private static final int MIN_DISTANCE = 50;
-	
-	
+
 	/**
 	 * Create a quadratic maximal planar graph.
-	 * @param vertexNumber	Total number of vertices of the graph
-	 * @param maxCapacity	Upper bound for the capacity of the arcs
-	 * @return	a maximal planar graph
+	 * 
+	 * @param vertexNumber
+	 *            Total number of vertices of the graph
+	 * @param maxCapacity
+	 *            Upper bound for the capacity of the arcs
+	 * @return a maximal planar graph
 	 * @throws Exception
 	 */
 	public static MGraph getBeautifulPlanarGraph(int vertexNumber, int maxCapacity)
@@ -70,23 +72,26 @@ public class GraphFactory {
 
 		// Create all horizontal arcs
 		Random random = new Random();
-		for (ArrayList<MVertex> row : vertices) 
+		for (ArrayList<MVertex> row : vertices)
 			for (int i = 1; i < row.size(); i++) {
-				MArc a = new MArc(row.get(i - 1), row.get(i), random.nextInt(maxCapacity));
+				MArc a = new MArc(row.get(i - 1), row.get(i),
+						random.nextInt(maxCapacity));
 				arcs.add(a);
 				row.get(i - 1).addIncidentArc(a);
+				row.get(i).addInArc(a);
 			}
 
 		// Create all vertical and diagonal arcs
 		for (int i = 0; i < vertices.size() - 1; i++) {
 			for (int j = 0; j < vertices.get(i).size(); j++) {
-				
+
 				// Vertical arc
 				MArc a = new MArc(vertices.get(i).get(j), vertices.get(i + 1).get(j),
 						random.nextInt(maxCapacity));
 				arcs.add(a);
 				vertices.get(i).get(j).addIncidentArc(a);
-				
+				vertices.get(i + 1).get(j).addInArc(a);
+
 				// Diagonal arc
 				if (j < vertices.get(i).size() - 1) {
 					// Not yet the last vertex on this row
@@ -96,25 +101,27 @@ public class GraphFactory {
 								random.nextInt(maxCapacity));
 						arcs.add(a);
 						vertices.get(i).get(j).addIncidentArc(a);
-					}
-					else {
+						vertices.get(i + 1).get(j + 1).addInArc(a);
+					} else {
 						a = new MArc(vertices.get(i).get(j + 1),
 								vertices.get(i + 1).get(j), random.nextInt(maxCapacity));
 						arcs.add(a);
 						vertices.get(i).get(j + 1).addIncidentArc(a);
+						vertices.get(i + 1).get(j).addInArc(a);
 					}
 				}
 			}
 			// Turning from short width to long width
-			if (vertices.get(i + 1).size() > vertices.get(i).size()){
-				MArc a = new MArc(vertices.get(i).get(vertices.get(i).size() - 1), 
-						vertices.get(i+1).get(vertices.get(i+1).size() - 1),
+			if (vertices.get(i + 1).size() > vertices.get(i).size()) {
+				MArc a = new MArc(vertices.get(i).get(vertices.get(i).size() - 1),
+						vertices.get(i + 1).get(vertices.get(i + 1).size() - 1),
 						random.nextInt(maxCapacity));
 				arcs.add(a);
 				vertices.get(i).get(vertices.get(i).size() - 1).addIncidentArc(a);
+				vertices.get(i + 1).get(vertices.get(i + 1).size() - 1).addInArc(a);
 			}
 		}
-		
+
 		// Insert all created vertices into the final list
 		ArrayList<MVertex> v = new ArrayList<>();
 		for (ArrayList<MVertex> row : vertices)
@@ -122,26 +129,27 @@ public class GraphFactory {
 
 		// For each arc, insert the corresponding reversed arc
 		ArrayList<MArc> reversedArcs = new ArrayList<>();
-		for (Arc arc: arcs) {
-			MArc a = new MArc(arc.getEndVertex(), 
-					arc.getStartVertex(), random.nextInt(maxCapacity));
+		for (Arc arc : arcs) {
+			MArc a = new MArc(arc.getEndVertex(), arc.getStartVertex(),
+					random.nextInt(maxCapacity));
 			reversedArcs.add(a);
 			arc.getEndVertex().addIncidentArc(a);
+			arc.getStartVertex().addInArc(a);
 			arc.setTwinArc(a);
 			a.setTwinArc(arc);
 		}
 		arcs.addAll(reversedArcs);
-		
-		System.out.println("[Graph Factory] New Graph Created. (V,A) = ("
-		+ v.size() + ", " + arcs.size() + ")");
-		
+
+		System.out.println("[Graph Factory] New Graph Created. (V,A) = (" + v.size()
+				+ ", " + arcs.size() + ")");
+
 		return new MGraph(v, arcs);
 	}
-	
 
 	/**
-	 * Random approach.
-	 * This approach cannot generate a beautiful maximal planar graph.
+	 * Random approach. This approach cannot generate a beautiful maximal planar
+	 * graph.
+	 * 
 	 * @param vertexNumber
 	 * @param maxCapacity
 	 * @return
@@ -161,12 +169,12 @@ public class GraphFactory {
 				if (!vertices.contains(v)) {
 					boolean tooNear = false;
 					for (MVertex addedV : vertices) {
-						if (v.distance(addedV.getX(), addedV.getY()) < MIN_DISTANCE){
+						if (v.distance(addedV.getX(), addedV.getY()) < MIN_DISTANCE) {
 							tooNear = true;
 							break;
 						}
 					}
-					if (!tooNear)		
+					if (!tooNear)
 						break;
 				}
 			}
@@ -177,9 +185,9 @@ public class GraphFactory {
 		Random random = new Random();
 		for (MVertex v1 : vertices)
 			for (MVertex v2 : vertices)
-				if (!(v1.equals(v2))) 
+				if (!(v1.equals(v2)))
 					allArcs.add(new MArc(v1, v2, random.nextInt(maxCapacity)));
-		
+
 		// Step by step insert arcs into the result graph
 		boolean intersected;
 		for (Arc e : allArcs) {
@@ -199,8 +207,8 @@ public class GraphFactory {
 		}
 
 		System.out.println("Graph Factory: New Graph Created!\n#Vertices: "
-		+ vertices.size() + "\n#Arcs = " + arcs.size());
-		
+				+ vertices.size() + "\n#Arcs = " + arcs.size());
+
 		return new MGraph(vertices, arcs);
 	}
 

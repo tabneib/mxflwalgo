@@ -58,6 +58,7 @@ public class ResArc extends Arc {
 	 */
 	public void pushFlow() {
 		int flowValue = Math.min(this.startVertex.getExcess(), this.resValue);
+		// TODO: figure out why sometimes flowValue is 0 !?
 		if (flowValue <= 0)
 			throw new RuntimeException("There is nothing to push! Arc: " + this + " : "
 					+ this.startVertex.getExcess() + "-" + this.resValue + "->"
