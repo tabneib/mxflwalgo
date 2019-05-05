@@ -1,10 +1,9 @@
 package de.nhd.mxflwalgo.algos;
 
 import java.awt.Color;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeSet;
 
 import de.nhd.mxflwalgo.model.Arc;
 import de.nhd.mxflwalgo.model.MArc;
@@ -16,28 +15,12 @@ import de.nhd.mxflwalgo.model.ResArc;
 public class GoldbergTarjan extends MaxFlowAlgo {
 
 	private boolean isInitialized = false;
-	private TreeSet<MVertex> activeVertices;
-	private static final Comparator<MVertex> comparator = new Comparator<MVertex>() {
-
-		@Override
-		public int compare(MVertex v1, MVertex v2) {
-			if (v1.equals(v2))
-				return 0;
-			if (v1.getHeight() > v2.getHeight())
-				return 1;
-			else if (v1.getHeight() == v2.getHeight()) {
-				if (v1.hashCode() > v2.hashCode())
-					return 1;
-				else
-					return -1;
-			} else
-				return -1;
-		}
-	};
+	private ArrayList<MVertex> activeVertices;
 
 	public GoldbergTarjan(MaxFlowProblem maxFlowProblem) {
 		super(maxFlowProblem);
-		this.activeVertices = new TreeSet<>(comparator);
+		//this.activeVertices = new TreeSet<>(comparator);
+		this.activeVertices = new ArrayList<>();
 	}
 
 	@Override
@@ -45,7 +28,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		this.initialize();
 
 		while (!this.activeVertices.isEmpty()) {
-			MVertex highestVertex = this.activeVertices.last();
+			MVertex highestVertex = this.activeVertices.get(0);
 			ResArc currentArc = highestVertex.getCurrentResArc();
 			while (currentArc != null
 					&& (!currentArc.isAdmissible() || currentArc.getResValue() <= 0))
@@ -60,7 +43,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 				currentArc.pushFlow();
 
 				if (highestVertex.getExcess() == 0) {
-					this.activeVertices.remove(highestVertex);
+					this.activeVertices.remove(0);
 				}
 			} else {
 				// Relabel
@@ -82,7 +65,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 		}
 
 		if (!this.activeVertices.isEmpty()) {
-			MVertex highestVertex = this.activeVertices.last();
+			MVertex highestVertex = this.activeVertices.get(0);
 			ResArc currentArc = highestVertex.getCurrentResArc();
 			while (currentArc != null
 					&& (!currentArc.isAdmissible() || currentArc.getResValue() <= 0))
@@ -98,17 +81,11 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 				highlightPushingArc(currentArc);
 				
 				if (highestVertex.getExcess() == 0) 
-					this.activeVertices.remove(highestVertex);
+					this.activeVertices.remove(0);
 			} else {
-				// Relabel
-				// Bug fixed: we have to remove and re-add the vertex since its
-				// height attribute is modified and the comparator depends on
-				// height
-				this.activeVertices.remove(highestVertex);
 				highestVertex.setHeight(highestVertex.getMinIncidentResArcHeight() + 1);
 				highestVertex.resetCurrentResArc();
 				highlightRelabelingVertex(highestVertex);
-				this.activeVertices.add(highestVertex);
 			}
 		} else
 			this.finished = true;
@@ -175,7 +152,7 @@ public class GoldbergTarjan extends MaxFlowAlgo {
 	public void reset() {
 		super.reset();
 		this.isInitialized = false;
-		this.activeVertices = new TreeSet<>(comparator);
+		this.activeVertices = new ArrayList<>();
 	}
 
 }
