@@ -140,7 +140,7 @@ public class GraphFactory {
 		}
 		arcs.addAll(reversedArcs);
 
-		System.out.println("[Graph Factory] New Graph Created. (V,A) = (" + v.size()
+		System.out.println("[Graph Factory] New Graph Created. (|V|,|A|) = (" + v.size()
 				+ ", " + arcs.size() + ")");
 
 		return new MGraph(v, arcs);

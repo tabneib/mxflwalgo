@@ -67,6 +67,9 @@ public class Dinic extends MaxFlowAlgo {
 		this.problem.getSource().setDistance(bfsSearchId, 0);
 		queue.addLast(this.problem.getSource());
 
+		// Construct the layer graph (determined by two attributes at each of its node,
+		// one for the distance from source node, the other is the last arc on the 
+		// shortest path from source node to that node).
 		while (!queue.isEmpty()) {
 			MVertex parent = queue.removeFirst();
 			for (ResArc childArc : parent.getIncidentResArcs()) {
@@ -106,9 +109,9 @@ public class Dinic extends MaxFlowAlgo {
 		if (!targetReached)
 			return false;
 
-		// Preliminary information is created in the resGraph
-		// Now we do one bfs more, this time from the target backwards
-		// to generate data for the layer graph at each of its nodes.
+		// Preliminary information about the layer graph is created in the resGraph
+		// Now we do one bfs more, this time from the target backwards to generate data 
+		// for the subgraph (used in blocking flow algorithm) at each of its nodes.
 		queue.add(this.problem.getTarget());
 		this.problem.getTarget().setIncluded(bfsSearchId);
 

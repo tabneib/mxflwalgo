@@ -3,8 +3,6 @@ package de.nhd.mxflwalgo.test;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import de.nhd.mxflwalgo.algos.Dinic;
 import de.nhd.mxflwalgo.algos.EdmondsKarp;
@@ -19,37 +17,38 @@ import de.nhd.mxflwalgo.model.MaxFlowProblem;
 
 public class AlgosTest {
 
-	@Test
-	public void verySmallGraph() {
-		runAlgos(4, 10);
-	}
-
-	@Test
-	public void smallGraph() {
-		runAlgos(20, 30);
-	}
-
-	@Test
-	public void mediumGraph() {
-		runAlgos(50, 30);
-	}
-
-	@Test
-	public void largeGraph() {
-		runAlgos(1000, 50);
-	}
-
-	@Test
-	public void largerGraph() {
-		runAlgos(4000, 300);
-	}
+	 @Test
+	 public void verySmallGraph() {
+	 runAlgos(4, 10);
+	 }
 	
+	 @Test
+	 public void smallGraph() {
+	 runAlgos(20, 30);
+	 }
+	
+	 @Test
+	 public void mediumGraph() {
+	 runAlgos(50, 30);
+	 }
+	
+	 @Test
+	 public void largeGraph() {
+	 runAlgos(1000, 50);
+	 }
+	
+//	 @Test
+//	 public void largerGraph() {
+//	 runAlgos(4000, 300);
+//	 }
+
 //	@Test
 //	public void giantGraph() {
-//		runAlgos(10000, 300);
-//	}	
+//		runAlgos(50000, 300);
+//	}
 
 	private void runAlgos(int vertexNumber, int maxCapacity) {
+		long startTime = System.currentTimeMillis();
 		MGraph graph;
 		try {
 			graph = GraphFactory.getBeautifulPlanarGraph(vertexNumber, maxCapacity);
@@ -81,6 +80,9 @@ public class AlgosTest {
 					problem.getTarget());
 			assertTrue(fordFulkersonFlow == edmondsKarpFlow
 					&& edmondsKarpFlow == dinicFlow && dinicFlow == goldbergTarjanFlow);
+
+			System.out.println(
+					"Total run time: " + (System.currentTimeMillis() - startTime) + "ms");
 
 		} catch (Exception e) {
 			e.printStackTrace();
